@@ -13,7 +13,8 @@ class AuthTest extends TestCase
     public function test_usuario_puede_registrarse()
     {
         $response = $this->postJson('/api/register', [
-            'name' => 'Test User',
+            'nombre' => 'Test',
+            'apellido' => 'User',
             'email' => 'test@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
@@ -21,7 +22,7 @@ class AuthTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonStructure([
-                'user' => ['id', 'name', 'email'],
+                'user' => ['id', 'nombre', 'apellido', 'email'],
                 'token',
             ]);
 
@@ -53,14 +54,15 @@ class AuthTest extends TestCase
             'password' => 'wrongpassword',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
     }
 
     public function test_usuario_puede_cerrar_sesion()
     {
         $user = User::factory()->create();
+        $token = $user->createToken('test')->plainTextToken;
 
-        $response = $this->actingAs($user)->postJson('/api/logout');
+        $response = $this->withToken($token)->postJson('/api/logout');
 
         $response->assertStatus(200);
     }
@@ -73,7 +75,7 @@ class AuthTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'data' => [
+                'user' => [
                     'id' => $user->id,
                     'email' => $user->email,
                 ],

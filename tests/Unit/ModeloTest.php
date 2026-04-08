@@ -17,7 +17,7 @@ class ModeloTest extends TestCase
 
     public function test_sector_tiene_relacion_con_asientos()
     {
-        $sector = Sector::factory()->create();
+        $sector  = Sector::factory()->create();
         $asiento = Asiento::factory()->create(['sector_id' => $sector->id]);
 
         $this->assertTrue($sector->asientos->contains($asiento));
@@ -25,7 +25,7 @@ class ModeloTest extends TestCase
 
     public function test_asiento_pertenece_a_sector()
     {
-        $sector = Sector::factory()->create();
+        $sector  = Sector::factory()->create();
         $asiento = Asiento::factory()->create(['sector_id' => $sector->id]);
 
         $this->assertEquals($sector->id, $asiento->sector->id);
@@ -67,18 +67,18 @@ class ModeloTest extends TestCase
 
     public function test_asiento_verifica_disponibilidad_para_evento()
     {
-        $evento = Evento::factory()->create();
+        $evento  = Evento::factory()->create();
         $asiento = Asiento::factory()->create();
 
-        $this->assertTrue($asiento->estaDisponible($evento->id));
+        $this->assertTrue($asiento->estaDisponibleParaEvento($evento->id));
 
         EstadoAsiento::factory()->create([
-            'evento_id' => $evento->id,
+            'evento_id'  => $evento->id,
             'asiento_id' => $asiento->id,
-            'estado' => 'bloqueado',
+            'estado'     => 'bloqueado',
         ]);
 
-        $this->assertFalse($asiento->fresh()->estaDisponible($evento->id));
+        $this->assertFalse($asiento->fresh()->estaDisponibleParaEvento($evento->id));
     }
 
     public function test_user_puede_tener_multiples_reservas()

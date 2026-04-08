@@ -6,7 +6,9 @@ use Tests\TestCase;
 use App\Services\CompraService;
 use App\Models\User;
 use App\Models\Evento;
+use App\Models\Sector;
 use App\Models\Asiento;
+use App\Models\Precio;
 use App\Models\EstadoAsiento;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -22,13 +24,31 @@ class CompraServiceTest extends TestCase
         $this->service = new CompraService();
     }
 
+    private function crearReservaCompleta($user, $minutos = 10)
+    {
+        $evento  = Evento::factory()->create();
+        $sector  = Sector::factory()->create();
+        $asiento = Asiento::factory()->create(['sector_id' => $sector->id]);
+
+        Precio::factory()->create([
+            'evento_id' => $evento->id,
+            'sector_id' => $sector->id,
+            'precio'    => 50.00,
+        ]);
+
+        return EstadoAsiento::factory()->create([
+            'evento_id'      => $evento->id,
+            'asiento_id'     => $asiento->id,
+            'user_id'        => $user->id,
+            'estado'         => 'bloqueado',
+            'reservado_hasta' => now()->addMinutes($minutos),
+        ]);
+    }
+
     public function test_puede_procesar_compra()
     {
-        $user = User::factory()->create();
-        $reserva = EstadoAsiento::factory()->create([
-            'user_id' => $user->id,
-            'reservado_hasta' => now()->addMinutes(10),
-        ]);
+        $user    = User::factory()->create();
+        $reserva = $this->crearReservaCompleta($user);
 
         $entradas = $this->service->procesarCompra([$reserva->id], $user->id);
 
@@ -38,7 +58,7 @@ class CompraServiceTest extends TestCase
 
     public function test_no_puede_procesar_compra_expirada()
     {
-        $user = User::factory()->create();
+        $user    = User::factory()->create();
         $reserva = EstadoAsiento::factory()->expirado()->create([
             'user_id' => $user->id,
         ]);
@@ -50,9 +70,11 @@ class CompraServiceTest extends TestCase
     public function test_puede_procesar_compra_multiple()
     {
         $user = User::factory()->create();
-        $reservas = EstadoAsiento::factory()->count(3)->create([
-            'user_id' => $user->id,
-            'reservado_hasta' => now()->addMinutes(10),
+
+        $reservas = collect([
+            $this->crearReservaCompleta($user),
+            $this->crearReservaCompleta($user),
+            $this->crearReservaCompleta($user),
         ]);
 
         $entradas = $this->service->procesarCompra(
@@ -65,11 +87,8 @@ class CompraServiceTest extends TestCase
 
     public function test_rollback_si_falla_una_compra()
     {
-        $user = User::factory()->create();
-        $reserva1 = EstadoAsiento::factory()->create([
-            'user_id' => $user->id,
-            'reservado_hasta' => now()->addMinutes(10),
-        ]);
+        $user     = User::factory()->create();
+        $reserva1 = $this->crearReservaCompleta($user);
         $reserva2 = EstadoAsiento::factory()->expirado()->create([
             'user_id' => $user->id,
         ]);

@@ -30,8 +30,10 @@ class EventoTest extends TestCase
         $response->assertStatus(200)
             ->assertJson([
                 'data' => [
-                    'id' => $evento->id,
-                    'nombre' => $evento->nombre,
+                    'evento' => [
+                        'id'     => $evento->id,
+                        'nombre' => $evento->nombre,
+                    ],
                 ],
             ]);
     }
@@ -41,10 +43,11 @@ class EventoTest extends TestCase
         $admin = User::factory()->create(['is_admin' => true]);
 
         $response = $this->actingAs($admin)->postJson('/api/admin/eventos', [
-            'nombre' => 'Concierto Rock',
-            'descripcion' => 'Gran concierto',
-            'fecha' => '2026-12-31',
-            'hora' => '20:00',
+            'nombre'            => 'Concierto Rock',
+            'descripcion_corta' => 'Gran concierto de rock',
+            'descripcion_larga' => 'Un gran concierto de rock con los mejores artistas',
+            'fecha'             => '2026-12-31',
+            'hora'              => '20:00',
         ]);
 
         $response->assertStatus(201);
@@ -58,10 +61,11 @@ class EventoTest extends TestCase
         $user = User::factory()->create(['is_admin' => false]);
 
         $response = $this->actingAs($user)->postJson('/api/admin/eventos', [
-            'nombre' => 'Concierto Rock',
-            'descripcion' => 'Gran concierto',
-            'fecha' => '2026-12-31',
-            'hora' => '20:00',
+            'nombre'            => 'Concierto Rock',
+            'descripcion_corta' => 'Gran concierto de rock',
+            'descripcion_larga' => 'Un gran concierto de rock con los mejores artistas',
+            'fecha'             => '2026-12-31',
+            'hora'              => '20:00',
         ]);
 
         $response->assertStatus(403);
@@ -69,26 +73,27 @@ class EventoTest extends TestCase
 
     public function test_admin_puede_actualizar_evento()
     {
-        $admin = User::factory()->create(['is_admin' => true]);
+        $admin  = User::factory()->create(['is_admin' => true]);
         $evento = Evento::factory()->create();
 
         $response = $this->actingAs($admin)->putJson("/api/admin/eventos/{$evento->id}", [
-            'nombre' => 'Nuevo Nombre',
-            'descripcion' => $evento->descripcion,
-            'fecha' => $evento->fecha->format('Y-m-d'),
-            'hora' => $evento->hora,
+            'nombre'            => 'Nuevo Nombre',
+            'descripcion_corta' => $evento->descripcion_corta,
+            'descripcion_larga' => $evento->descripcion_larga,
+            'fecha'             => $evento->fecha->format('Y-m-d'),
+            'hora'              => '20:00',
         ]);
 
         $response->assertStatus(200);
         $this->assertDatabaseHas('eventos', [
-            'id' => $evento->id,
+            'id'     => $evento->id,
             'nombre' => 'Nuevo Nombre',
         ]);
     }
 
     public function test_admin_puede_eliminar_evento_sin_entradas()
     {
-        $admin = User::factory()->create(['is_admin' => true]);
+        $admin  = User::factory()->create(['is_admin' => true]);
         $evento = Evento::factory()->create();
 
         $response = $this->actingAs($admin)->deleteJson("/api/admin/eventos/{$evento->id}");

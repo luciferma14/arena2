@@ -26,14 +26,15 @@ class ReservaServiceTest extends TestCase
 
     public function test_puede_reservar_asiento_disponible()
     {
-        $user = User::factory()->create();
-        $evento = Evento::factory()->create();
-        $sector = Sector::factory()->create();
+        $user    = User::factory()->create();
+        $evento  = Evento::factory()->create();
+        $sector  = Sector::factory()->create();
         $asiento = Asiento::factory()->create(['sector_id' => $sector->id]);
 
         Precio::factory()->create([
-            'evento_id' => $evento->id,
-            'sector_id' => $sector->id,
+            'evento_id'  => $evento->id,
+            'sector_id'  => $sector->id,
+            'disponible' => true,
         ]);
 
         $reserva = $this->service->reservarAsiento($evento->id, $asiento->id, $user->id);
@@ -44,14 +45,14 @@ class ReservaServiceTest extends TestCase
 
     public function test_no_puede_reservar_asiento_ocupado()
     {
-        $user = User::factory()->create();
-        $evento = Evento::factory()->create();
+        $user    = User::factory()->create();
+        $evento  = Evento::factory()->create();
         $asiento = Asiento::factory()->create();
 
         EstadoAsiento::factory()->create([
-            'evento_id' => $evento->id,
+            'evento_id'  => $evento->id,
             'asiento_id' => $asiento->id,
-            'estado' => 'bloqueado',
+            'estado'     => 'bloqueado',
         ]);
 
         $this->expectException(\Exception::class);
@@ -60,9 +61,10 @@ class ReservaServiceTest extends TestCase
 
     public function test_puede_cancelar_reserva()
     {
-        $reserva = EstadoAsiento::factory()->create();
+        $user    = User::factory()->create();
+        $reserva = EstadoAsiento::factory()->create(['user_id' => $user->id]);
 
-        $resultado = $this->service->cancelarReserva($reserva->id);
+        $resultado = $this->service->cancelarReserva($reserva->id, $user->id);
 
         $this->assertTrue($resultado);
         $this->assertDatabaseMissing('estado_asientos', ['id' => $reserva->id]);
@@ -73,12 +75,12 @@ class ReservaServiceTest extends TestCase
         $user = User::factory()->create();
 
         EstadoAsiento::factory()->count(2)->create([
-            'user_id' => $user->id,
-            'estado' => 'bloqueado',
+            'user_id'         => $user->id,
+            'estado'          => 'bloqueado',
             'reservado_hasta' => now()->addMinutes(10),
         ]);
 
-        $reservas = $this->service->obtenerReservasUsuario($user->id);
+        $reservas = $this->service->obtenerReservasActivas($user->id);
 
         $this->assertCount(2, $reservas);
     }
@@ -88,11 +90,11 @@ class ReservaServiceTest extends TestCase
         $user = User::factory()->create();
 
         EstadoAsiento::factory()->create([
-            'user_id' => $user->id,
+            'user_id'         => $user->id,
             'reservado_hasta' => now()->subMinutes(20),
         ]);
 
-        $reservas = $this->service->obtenerReservasUsuario($user->id);
+        $reservas = $this->service->obtenerReservasActivas($user->id);
 
         $this->assertCount(0, $reservas);
     }
