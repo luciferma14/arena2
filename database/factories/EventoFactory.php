@@ -12,12 +12,12 @@ class EventoFactory extends Factory
     public function definition(): array
     {
         return [
-            'nombre'            => fake()->sentence(3),
-            'descripcion_corta' => fake()->sentence(8),
-            'descripcion_larga' => fake()->paragraph(3),
-            'poster_url'        => fake()->imageUrl(640, 480, 'events'),
-            'fecha'             => fake()->unique()->dateTimeBetween('+1 month', '+2 years')->format('Y-m-d'),
-            'hora'              => fake()->time('H:i'),
+            'nombre' => $this->faker->sentence(3),
+            'descripcion_corta' => $this->faker->sentence(),
+            'descripcion_larga' => $this->faker->paragraph(),
+            'poster_url' => $this->faker->imageUrl(640, 480, 'events', true),
+            'fecha' => $this->faker->dateTimeBetween('now', '+1 year'),
+            'hora' => $this->faker->time('H:i'),
         ];
     }
 }
