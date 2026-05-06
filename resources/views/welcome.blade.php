@@ -1,3 +1,53 @@
+@extends('layouts.app')
+
+@section('title', 'Roig Arena - Venta de Entradas')
+
+@section('content')
+<div class="min-h-screen bg-gradient-to-br from-red-600 to-red-800 text-white -mx-4 -mt-8 px-4 py-20">
+    <div class="max-w-7xl mx-auto text-center">
+        <h1 class="text-6xl font-bold mb-4">🎭 Roig Arena</h1>
+        <p class="text-2xl mb-8 opacity-90">Sistema de Venta de Entradas para Eventos</p>
+
+        <div class="flex gap-4 justify-center flex-wrap mb-12">
+            @if (auth()->check())
+                <a href="{{ route('home') }}" class="bg-white text-red-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100">
+                    🎫 Ver Eventos
+                </a>
+                <a href="{{ route('dashboard') }}" class="bg-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-red-800 border-2 border-white">
+                    👤 Mi Cuenta
+                </a>
+            @else
+                <a href="{{ route('home') }}" class="bg-white text-red-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100">
+                    🎫 Ver Eventos
+                </a>
+                <a href="{{ route('login') }}" class="bg-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-red-800 border-2 border-white">
+                    Iniciar Sesión
+                </a>
+            @endif
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
+            <div class="bg-white text-gray-800 p-8 rounded-lg shadow-xl">
+                <div class="text-5xl mb-4">🎪</div>
+                <h3 class="text-xl font-bold mb-2">Eventos Variados</h3>
+                <p class="text-gray-600">Conciertos, teatro, deportes y mucho más</p>
+            </div>
+            <div class="bg-white text-gray-800 p-8 rounded-lg shadow-xl">
+                <div class="text-5xl mb-4">🛡️</div>
+                <h3 class="text-xl font-bold mb-2">Seguridad</h3>
+                <p class="text-gray-600">Transacciones seguras con autenticación</p>
+            </div>
+            <div class="bg-white text-gray-800 p-8 rounded-lg shadow-xl">
+                <div class="text-5xl mb-4">⚡</div>
+                <h3 class="text-xl font-bold mb-2">Instantáneo</h3>
+                <p class="text-gray-600">Compra tus entradas en segundos</p>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+<!--
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
