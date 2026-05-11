@@ -11,74 +11,42 @@
         </div>
 
         <form id="signupForm" class="space-y-4">
-            <!-- Row 1: Nombre y Apellido -->
             <div class="grid md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-slate-300 text-sm font-semibold mb-1.5">Nombre</label>
-                    <input
-                        type="text"
-                        id="fname"
-                        class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
-                        required
-                    >
+                    <input type="text" id="fname" class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none" required>
                     <div id="fnameErr" class="text-xs text-red-400 mt-1 hidden"></div>
                 </div>
 
                 <div>
                     <label class="block text-slate-300 text-sm font-semibold mb-1.5">Apellido</label>
-                    <input
-                        type="text"
-                        id="lname"
-                        class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
-                        required
-                    >
+                    <input type="text" id="lname" class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none" required>
                     <div id="lnameErr" class="text-xs text-red-400 mt-1 hidden"></div>
                 </div>
             </div>
 
-            <!-- Row 2: Email -->
             <div>
                 <label class="block text-slate-300 text-sm font-semibold mb-1.5">Email</label>
-                <input
-                    type="email"
-                    id="emailAddr"
-                    class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
-                    required
-                >
+                <input type="email" id="emailAddr" class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none" required>
                 <div id="emailErr" class="text-xs text-red-400 mt-1 hidden"></div>
             </div>
 
-            <!-- Row 3: Passwords -->
             <div class="grid md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-slate-300 text-sm font-semibold mb-1.5">Contraseña</label>
-                    <input
-                        type="password"
-                        id="passwd"
-                        class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
-                        required
-                        minlength="8"
-                    >
+                    <input type="password" id="passwd" class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none" required minlength="8">
                     <div id="passwdErr" class="text-xs text-red-400 mt-1 hidden"></div>
                     <p class="text-xs text-slate-400 mt-1">Mín. 8 caracteres</p>
                 </div>
 
                 <div>
                     <label class="block text-slate-300 text-sm font-semibold mb-1.5">Confirmar</label>
-                    <input
-                        type="password"
-                        id="passwdConf"
-                        class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
-                        required
-                    >
+                    <input type="password" id="passwdConf" class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none" required>
                     <div id="passwdConfErr" class="text-xs text-red-400 mt-1 hidden"></div>
                 </div>
             </div>
 
-            <button
-                type="submit"
-                class="w-full py-3 mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition"
-            >
+            <button type="submit" class="w-full py-3 mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition">
                 Crear Cuenta
             </button>
 
@@ -91,63 +59,54 @@
 
 <script>
 const SignUpCtrl = {
-    form: document.getElementById('signupForm'),
-    inputs: {
-        fname: document.getElementById('fname'),
-        lname: document.getElementById('lname'),
-        email: document.getElementById('emailAddr'),
-        pwd: document.getElementById('passwd'),
-        pwdConf: document.getElementById('passwdConf')
-    },
-    errors: {
-        fname: document.getElementById('fnameErr'),
-        lname: document.getElementById('lnameErr'),
-        email: document.getElementById('emailErr'),
-        pwd: document.getElementById('passwdErr'),
-        pwdConf: document.getElementById('passwdConfErr')
+    async init() {
+        document.getElementById('signupForm').addEventListener('submit', (e) => this.submit(e));
     },
 
     clearErrors() {
-        Object.values(this.errors).forEach(el => el.classList.add('hidden'));
+        ['fnameErr', 'lnameErr', 'emailErr', 'passwdErr', 'passwdConfErr'].forEach(id => {
+            document.getElementById(id).classList.add('hidden');
+        });
     },
 
-    showError(field, msg) {
-        this.errors[field].textContent = msg;
-        this.errors[field].classList.remove('hidden');
+    showError(fieldId, msg) {
+        document.getElementById(fieldId).textContent = msg;
+        document.getElementById(fieldId).classList.remove('hidden');
     },
 
     async submit(e) {
         e.preventDefault();
         this.clearErrors();
 
-        if (this.inputs.pwd.value !== this.inputs.pwdConf.value) {
-            this.showError('pwdConf', '❌ Las contraseñas no coinciden');
+        const pwd = document.getElementById('passwd').value;
+        const pwdConf = document.getElementById('passwdConf').value;
+
+        if (pwd !== pwdConf) {
+            this.showError('passwdConfErr', '❌ Las contraseñas no coinciden');
             return;
         }
 
         try {
-            const res = await fetch('/api/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nombre: this.inputs.fname.value,
-                    apellido: this.inputs.lname.value,
-                    email: this.inputs.email.value,
-                    password: this.inputs.pwd.value,
-                    password_confirmation: this.inputs.pwdConf.value
-                })
+            const { data } = await window.axios.post('/register', {
+                nombre: document.getElementById('fname').value,
+                apellido: document.getElementById('lname').value,
+                email: document.getElementById('emailAddr').value,
+                password: pwd,
+                password_confirmation: pwdConf
             });
 
-            const data = await res.json();
-
-            if (res.ok && data.token) {
-                localStorage.setItem('auth_token', data.token);
-                window.axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-                location.href = '{{ route("dashboard") }}';
-            } else {
-                this.showError('email', `❌ ${data.message || 'Error al registrarse'}`);
-            }
+            Auth.set(data.token);
+            location.href = '{{ route("dashboard") }}';
         } catch (err) {
+            const msg = err.response?.data?.message || 'Error al registrarse';
+            this.showError('emailErr', '❌ ' + msg);
+        }
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => SignUpCtrl.init());
+</script>
+@endsection
             this.showError('email', '❌ Error de conexión');
         }
     }

@@ -52,25 +52,27 @@ const CartApp = {
 
         for (const eventId of eventIds) {
             try {
-                const res = await fetch(`/api/eventos/${eventId}`);
-                const json = await res.json();
-                const event = json.data.evento;
+                const { data } = await window.axios.get(`/eventos/${eventId}`);
+                const event = data.evento;
                 const items = this.cart[eventId] || [];
 
                 const section = document.createElement('div');
                 section.className = 'rounded-3xl border border-slate-700 bg-slate-900/70 p-6';
+
+                const dateStr = new Date(event.fecha_evento).toLocaleDateString('es-ES');
+                const hora = event.hora || 'N/A';
                 section.innerHTML = `
                     <div class="flex items-center justify-between mb-6">
                         <div>
                             <h3 class="text-2xl font-semibold text-white">${event.nombre}</h3>
-                            <p class="text-slate-500 text-sm mt-1">${new Date(event.fecha_evento).toLocaleDateString('es-ES')} · ${event.hora}</p>
+                            <p class="text-slate-500 text-sm mt-1">${dateStr} · ${hora}</p>
                         </div>
                         <span class="inline-flex items-center gap-2 rounded-full bg-cyan-500/10 px-4 py-2 text-cyan-300 text-sm">${items.length} sector${items.length > 1 ? 'es' : ''}</span>
                     </div>
                 `;
 
                 items.forEach((item, idx) => {
-                    const lineTotal = item.price * item.cantidad;
+                    const lineTotal = (item.price || 0) * item.cantidad;
                     totalPrice += lineTotal;
                     totalQty += item.cantidad;
                     section.innerHTML += `
@@ -135,9 +137,8 @@ const CartApp = {
     },
 
     async checkout() {
-        const token = localStorage.getItem('auth_token');
-        if (!token) {
-            location.href = '{{ route('login') }}';
+        if (!Auth.get()) {
+            location.href = '{{ route("login") }}';
             return;
         }
 
@@ -153,25 +154,12 @@ const CartApp = {
         }
 
         try {
-            const res = await fetch('/api/compras', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ reservas: payload })
-            });
-
-            if (res.ok) {
-                localStorage.removeItem(this.cartKey);
-                location.href = '{{ route('entradas') }}';
-            } else {
-                const err = await res.json();
-                alert(err.message || 'No se pudo completar la compra');
-            }
+            await window.axios.post('/compras', { reservas: payload });
+            localStorage.removeItem(this.cartKey);
+            location.href = '{{ route("entradas") }}';
         } catch (error) {
-            console.error(error);
-            alert('Error al procesar la compra');
+            const msg = error.response?.data?.message || 'Error al procesar la compra';
+            alert(msg);
         }
     }
 };
@@ -179,24 +167,6 @@ const CartApp = {
 document.addEventListener('DOMContentLoaded', () => CartApp.init());
 </script>
 @endsection
-function removeItem(eventoId, index) {
-    let carrito = JSON.parse(localStorage.getItem('carrito') || '{}');
-    if (carrito[eventoId]) {
-        carrito[eventoId].splice(index, 1);
-        if (carrito[eventoId].length === 0) {
-            delete carrito[eventoId];
-        }
-        localStorage.setItem('carrito', JSON.stringify(carrito));
-        actualizarCarrito();
-    }
-}
-
-async function procederAComprar() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        alert('Debes iniciar sesión para comprar');
-        return;
-    }
 
     const carrito = JSON.parse(localStorage.getItem('carrito') || '{}');
 

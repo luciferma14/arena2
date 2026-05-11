@@ -67,8 +67,13 @@
         </div>
     </footer>
 
-    <script src="{{ asset('js/bootstrap.js') }}"></script>
     <script>
+        // Configuración global de Axios
+        window.axios = axios;
+        window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+        window.axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        window.axios.defaults.baseURL = '/api';
+
         const TOKEN_KEY = 'auth_token';
 
         const Auth = {
@@ -77,14 +82,18 @@
                 localStorage.setItem(TOKEN_KEY, token);
                 window.axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             },
-            clear() { localStorage.removeItem(TOKEN_KEY); }
+            clear() {
+                localStorage.removeItem(TOKEN_KEY);
+                delete window.axios.defaults.headers.common['Authorization'];
+            }
         };
 
         const handleLogout = async () => {
             if (confirm('¿Deseas cerrar sesión?')) {
                 try {
-                    await window.axios.post('/api/logout');
-                } finally {
+                    await window.axios.post('/logout');
+                } catch(e) {}
+                finally {
                     Auth.clear();
                     location.href = '/';
                 }
@@ -92,10 +101,7 @@
         };
 
         // Initialize auth on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            const token = Auth.get();
-            if (token) Auth.set(token);
-        });
+        if (Auth.get()) Auth.set(Auth.get());
     </script>
 
     @yield('scripts')
