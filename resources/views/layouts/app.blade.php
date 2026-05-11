@@ -68,40 +68,18 @@
     </footer>
 
     <script>
-        // Configuración global de Axios
-        window.axios = axios;
-        window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-        window.axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        window.axios.defaults.baseURL = '/api';
-
-        const TOKEN_KEY = 'auth_token';
-
-        const Auth = {
-            get() { return localStorage.getItem(TOKEN_KEY); },
-            set(token) {
-                localStorage.setItem(TOKEN_KEY, token);
-                window.axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            },
-            clear() {
-                localStorage.removeItem(TOKEN_KEY);
-                delete window.axios.defaults.headers.common['Authorization'];
-            }
-        };
-
+        // handleLogout - utiliza window.Auth del bootstrap.js
         const handleLogout = async () => {
             if (confirm('¿Deseas cerrar sesión?')) {
                 try {
                     await window.axios.post('/logout');
                 } catch(e) {}
                 finally {
-                    Auth.clear();
+                    window.Auth.clear();
                     location.href = '/';
                 }
             }
         };
-
-        // Initialize auth on page load
-        if (Auth.get()) Auth.set(Auth.get());
     </script>
 
     @yield('scripts')
