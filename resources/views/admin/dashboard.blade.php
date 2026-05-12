@@ -310,6 +310,7 @@
             .then(r => r.json())
             .then(data => {
                 // Ajusta según lo que devuelva tu API para un sector individual
+                console.log('Respuesta API sector:', JSON.stringify(data));
                 const sector = data.data.sector ?? data.data;
 
                 document.getElementById('sector-id').value = sector.id;
