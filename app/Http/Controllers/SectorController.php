@@ -22,6 +22,18 @@ class SectorController extends Controller
     }
 
     /**
+     * Obtener sector por ID (público)
+     */
+    public function show($id)
+    {
+        $sector = Sector::findOrFail($id);
+
+        return response()->json([
+            'data' => $sector,
+        ]);
+    }
+
+    /**
      * Crear sector (admin)
      */
     public function store(Request $request)
