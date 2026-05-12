@@ -85,7 +85,7 @@
         </div>
 
         {{-- Barra de compra fija abajo --}}
-        @auth
+        @auth('sanctum')
         <div class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur border-t border-slate-700 z-50 py-4 px-6">
             <div class="max-w-7xl mx-auto flex justify-between items-center gap-4">
                 <div>
