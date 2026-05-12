@@ -39,6 +39,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/entradas', function () {
         return view('entradas.index');
     })->name('entradas');
+
+    // Admin routes
+    Route::middleware('admin')->group(function () {
+        Route::get('/admin', function () {
+            return view('admin.dashboard');
+        })->name('admin.dashboard');
+    });
 });
 
 // Evento individual

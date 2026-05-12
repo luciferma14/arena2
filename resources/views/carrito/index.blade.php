@@ -1,230 +1,265 @@
 @extends('layouts.app')
 
-@section('title', 'Checkout - TicketLand')
+@section('title', 'Carrito de Compras - Roig Arena')
 
 @section('content')
-<div class="mb-8">
-    <a href="{{ route('home') }}" class="text-cyan-400 hover:text-cyan-300 text-sm">← Volver al catálogo</a>
-    <h1 class="text-5xl font-black text-white mt-4">Carrito de Compra</h1>
-    <p class="text-slate-400 mt-2">Revisa tus asientos reservados antes de finalizar</p>
-</div>
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold mb-3 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+            🛒 Carrito de Compras
+        </h1>
+        <p class="text-slate-400">Revisa y confirma tu compra</p>
+    </div>
 
-<div class="grid gap-8 lg:grid-cols-[1.6fr_0.9fr]">
-    <section id="cartItems" class="space-y-4 text-slate-300">
-        <div class="p-8 rounded-3xl border border-slate-700 bg-slate-900/70 text-center">
-            <p class="text-slate-500">Cargando contenido del carrito...</p>
+    <!-- Loading State -->
+    <div id="loading" class="text-center py-12 hidden">
+        <div class="inline-block animate-spin">
+            <div class="h-8 w-8 border-4 border-red-600 border-t-transparent rounded-full"></div>
         </div>
-    </section>
+        <p class="text-slate-400 mt-3">Cargando carrito...</p>
+    </div>
 
-    <aside class="space-y-4">
-        <div class="rounded-3xl border border-slate-700 bg-slate-900/70 p-6">
-            <h2 class="text-2xl font-bold text-white mb-4">Resumen</h2>
-            <div id="cartStatus" class="space-y-4 text-slate-300">
-                <p>Esperando selección...</p>
+    <!-- Empty Cart -->
+    <div id="empty-cart" class="text-center py-12">
+        <p class="text-6xl mb-4">🛒</p>
+        <p class="text-slate-400 text-lg mb-6">Tu carrito está vacío</p>
+        <a href="{{ route('home') }}" class="inline-block px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition">
+            Ver Eventos
+        </a>
+    </div>
+
+    <!-- Cart Items -->
+    <div id="cart-content" class="hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Items List -->
+            <div class="lg:col-span-2">
+                <div id="cart-items" class="space-y-4">
+                    <!-- Items will be loaded here -->
+                </div>
             </div>
-        </div>
-        <div class="rounded-3xl border border-slate-700 bg-slate-900/70 p-6">
-            <h2 class="text-2xl font-bold text-white mb-4">Información</h2>
-            <p class="text-slate-500 text-sm leading-relaxed">Las reservas se bloquean de forma temporal hasta completar la compra.</p>
-        </div>
-    </aside>
-</div>
 
-<script>
-const CartApp = {
-    cartKey: 'cart_tickets',
-    cart: {},
-    cartItems: document.getElementById('cartItems'),
-    cartStatus: document.getElementById('cartStatus'),
+            <!-- Sidebar - Summary -->
+            <div class="bg-slate-800 rounded-lg border border-slate-700 p-6 h-fit sticky top-24">
+                <h3 class="text-xl font-bold text-white mb-6">Resumen de Compra</h3>
 
-    async init() {
-        this.cart = JSON.parse(localStorage.getItem(this.cartKey) || '{}');
-        const eventIds = Object.keys(this.cart);
-
-        if (eventIds.length === 0) {
-            this.renderEmpty();
-            return;
-        }
-
-        this.cartItems.innerHTML = '';
-        let totalPrice = 0;
-        let totalQty = 0;
-
-        for (const eventId of eventIds) {
-            try {
-                const { data } = await window.axios.get(`/eventos/${eventId}`);
-                const event = data.evento;
-                const items = this.cart[eventId] || [];
-
-                const section = document.createElement('div');
-                section.className = 'rounded-3xl border border-slate-700 bg-slate-900/70 p-6';
-
-                const dateStr = new Date(event.fecha_evento).toLocaleDateString('es-ES');
-                const hora = event.hora || 'N/A';
-                section.innerHTML = `
-                    <div class="flex items-center justify-between mb-6">
-                        <div>
-                            <h3 class="text-2xl font-semibold text-white">${event.nombre}</h3>
-                            <p class="text-slate-500 text-sm mt-1">${dateStr} · ${hora}</p>
-                        </div>
-                        <span class="inline-flex items-center gap-2 rounded-full bg-cyan-500/10 px-4 py-2 text-cyan-300 text-sm">${items.length} sector${items.length > 1 ? 'es' : ''}</span>
+                <div class="space-y-4 mb-6 pb-6 border-b border-slate-600">
+                    <div class="flex justify-between text-slate-300">
+                        <span>Asientos:</span>
+                        <span id="summary-cantidad" class="font-semibold">0</span>
                     </div>
-                `;
-
-                items.forEach((item, idx) => {
-                    const lineTotal = (item.price || 0) * item.cantidad;
-                    totalPrice += lineTotal;
-                    totalQty += item.cantidad;
-                    section.innerHTML += `
-                        <div class="mb-4 rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
-                            <div class="flex justify-between items-start gap-4">
-                                <div>
-                                    <p class="text-white font-semibold">${item.sectorName}</p>
-                                    <p class="text-slate-500 text-sm">Cantidad: ${item.cantidad}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-bold text-cyan-300">$${lineTotal.toFixed(2)}</p>
-                                    <button onclick="CartApp.removeItem(${eventId}, ${idx})" class="text-xs text-rose-400 hover:text-rose-200 mt-2">Eliminar</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                this.cartItems.appendChild(section);
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        this.renderSummary(totalQty, totalPrice);
-    },
-
-    renderSummary(totalQty, totalPrice) {
-        this.cartStatus.innerHTML = `
-            <div class="space-y-4">
-                <div class="flex justify-between text-slate-400">
-                    <span>Total entradas:</span>
-                    <span>${totalQty}</span>
+                    <div class="flex justify-between text-lg font-bold text-white">
+                        <span>Total:</span>
+                        <span id="summary-total" class="text-red-400">€0.00</span>
+                    </div>
                 </div>
-                <div class="flex justify-between text-white font-bold text-lg">
-                    <span>Total a pagar:</span>
-                    <span>$${totalPrice.toFixed(2)}</span>
-                </div>
-                <button onclick="CartApp.checkout()" class="w-full mt-4 rounded-2xl bg-cyan-500 py-3 text-sm font-semibold text-slate-950 hover:bg-cyan-400 transition">
-                    Continuar a Pago
+
+                <button onclick="confirmarCompra()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition duration-200 mb-3">
+                    ✅ Confirmar Compra
+                </button>
+
+                <button onclick="vaciarCarrito()" class="w-full py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 font-semibold rounded-lg transition duration-200">
+                    🗑️ Vaciar Carrito
                 </button>
             </div>
-        `;
-    },
+        </div>
+    </div>
 
-    renderEmpty() {
-        this.cartItems.innerHTML = `
-            <div class="rounded-3xl border border-slate-700 bg-slate-900/60 p-10 text-center text-slate-500">
-                <p class="mb-4 text-lg">Tu carrito está vacío.</p>
-                <a href="{{ route('home') }}" class="inline-flex px-5 py-3 rounded-full bg-cyan-500 text-slate-950 font-semibold hover:bg-cyan-400 transition">Ver eventos</a>
-            </div>
-        `;
-        this.cartStatus.innerHTML = '';
-    },
+    <!-- Error Message -->
+    <div id="error-message" class="hidden p-4 rounded-lg bg-red-950/40 border-l-4 border-red-500 text-red-200">
+        <p id="error-text"></p>
+    </div>
+</div>
 
-    removeItem(eventId, idx) {
-        if (!this.cart[eventId]) return;
-        this.cart[eventId].splice(idx, 1);
-        if (this.cart[eventId].length === 0) delete this.cart[eventId];
-        localStorage.setItem(this.cartKey, JSON.stringify(this.cart));
-        this.init();
-    },
+@endsection
 
-    async checkout() {
-        if (!Auth.get()) {
-            location.href = '{{ route("login") }}';
+@section('scripts')
+<script>
+    let carrito = [];
+
+    function cargarCarrito() {
+        carrito = JSON.parse(localStorage.getItem('reservas') || '[]');
+
+        if (carrito.length === 0) {
+            document.getElementById('empty-cart').classList.remove('hidden');
+            document.getElementById('cart-content').classList.add('hidden');
             return;
         }
 
-        const payload = [];
-        for (const [eventId, items] of Object.entries(this.cart)) {
-            for (const item of items) {
-                payload.push({
-                    evento_id: parseInt(eventId),
-                    sector_id: item.sectorId,
-                    cantidad: item.cantidad
-                });
+        document.getElementById('empty-cart').classList.add('hidden');
+        document.getElementById('loading').classList.remove('hidden');
+
+        cargarDetallesReservas();
+    }
+
+    async function cargarDetallesReservas() {
+        try {
+            const response = await fetch('/api/reservas', {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al cargar reservas');
             }
+
+            const data = await response.json();
+            const reservasAPI = data.data;
+
+            // Enriquecer carrito con datos de API
+            const carritoEnriquecido = carrito.map(item => {
+                const reserva = reservasAPI.find(r => r.id === item.id);
+                if (reserva) {
+                    return {
+                        ...item,
+                        evento_nombre: reserva.evento?.nombre || 'Evento desconocido',
+                        evento_id: reserva.evento_id,
+                        evento_fecha: reserva.evento?.fecha,
+                        evento_hora: reserva.evento?.hora,
+                        asiento_nombre: reserva.asiento?.nombreCompleto || 'Asiento desconocido',
+                        tiempo_restante: this.getTiempoRestante(reserva.reservado_hasta)
+                    };
+                }
+                return item;
+            });
+
+            renderizarCarrito(carritoEnriquecido);
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('cart-content').classList.remove('hidden');
+
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error-message').classList.remove('hidden');
+            document.getElementById('error-text').textContent = error.message;
+        }
+    }
+
+    getTiempoRestante = (fecha) => {
+        if (!fecha) return null;
+        const ahora = new Date();
+        const reservado = new Date(fecha);
+        const diff = reservado - ahora;
+        if (diff <= 0) return '0m';
+
+        const minutos = Math.floor(diff / 60000);
+        const horas = Math.floor(minutos / 60);
+
+        if (horas > 0) {
+            return `${horas}h ${minutos % 60}m`;
+        }
+        return `${minutos}m`;
+    };
+
+    function renderizarCarrito(items) {
+        const container = document.getElementById('cart-items');
+        let total = 0;
+
+        container.innerHTML = items.map((item, index) => {
+            total += item.precio || 0;
+            return `
+                <div class="bg-slate-800 rounded-lg border border-slate-700 p-4 flex justify-between items-start gap-4">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-white mb-2">${item.evento_nombre}</h4>
+                        <div class="space-y-1 text-sm text-slate-400">
+                            <p>📅 ${item.evento_fecha ? new Date(item.evento_fecha).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Fecha desconocida'}</p>
+                            <p>🕐 ${item.evento_hora || 'Hora desconocida'}</p>
+                            <p>💺 ${item.asiento_nombre}</p>
+                            <p class="text-yellow-400">⏱️ ${item.tiempo_restante || '15m'} restantes</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-lg font-bold text-red-400 mb-3">€${(item.precio || 0).toFixed(2)}</p>
+                        <button onclick="eliminarDelCarrito(${index})" class="px-3 py-1 bg-red-600/20 text-red-400 border border-red-600/50 rounded hover:bg-red-600/30 transition text-sm font-semibold">
+                            ❌ Quitar
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Actualizar resumen
+        document.getElementById('summary-cantidad').textContent = items.length;
+        document.getElementById('summary-total').textContent = `€${total.toFixed(2)}`;
+    }
+
+    function eliminarDelCarrito(index) {
+        carrito.splice(index, 1);
+        localStorage.setItem('reservas', JSON.stringify(carrito));
+        window.dispatchEvent(new Event('storage'));
+        cargarCarrito();
+    }
+
+    function vaciarCarrito() {
+        if (!confirm('¿Estás seguro de que deseas vaciar el carrito?')) {
+            return;
+        }
+
+        carrito.forEach(async (item) => {
+            try {
+                await fetch(`/api/reservas/${item.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+            } catch (error) {
+                console.error('Error al eliminar reserva:', error);
+            }
+        });
+
+        carrito = [];
+        localStorage.setItem('reservas', JSON.stringify(carrito));
+        window.dispatchEvent(new Event('storage'));
+        cargarCarrito();
+    }
+
+    async function confirmarCompra() {
+        if (carrito.length === 0) {
+            alert('El carrito está vacío');
+            return;
         }
 
         try {
-            await window.axios.post('/compras', { reservas: payload });
-            localStorage.removeItem(this.cartKey);
-            location.href = '{{ route("entradas") }}';
-        } catch (error) {
-            const msg = error.response?.data?.message || 'Error al procesar la compra';
-            alert(msg);
-        }
-    }
-};
+            const response = await fetch('/api/compras', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    reservas: carrito.map(item => item.id)
+                })
+            });
 
-document.addEventListener('DOMContentLoaded', () => CartApp.init());
-</script>
-@endsection
+            const data = await response.json();
 
-    const carrito = JSON.parse(localStorage.getItem('carrito') || '{}');
-
-    try {
-        // Crear reservas primero
-        const reservas = [];
-        for (const [eventoId, items] of Object.entries(carrito)) {
-            for (const item of items) {
-                const reservaResponse = await fetch('/api/reservas', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        evento_id: parseInt(eventoId),
-                        sector_id: item.sectorId,
-                        cantidad: item.cantidad
-                    })
-                });
-
-                if (reservaResponse.ok) {
-                    const reservaData = await reservaResponse.json();
-                    reservas.push({
-                        evento_id: parseInt(eventoId),
-                        sector_id: item.sectorId,
-                        cantidad: item.cantidad
-                    });
-                } else {
-                    alert('Error al realizar la reserva');
-                    return;
-                }
+            if (!response.ok) {
+                throw new Error(data.error || 'Error al procesar la compra');
             }
-        }
 
-        // Proceder con la compra
-        const compraResponse = await fetch('/api/compras', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                reservas: reservas
-            })
-        });
+            // Limpiar carrito
+            localStorage.setItem('reservas', JSON.stringify([]));
+            window.dispatchEvent(new Event('storage'));
 
-        if (compraResponse.ok) {
-            alert('¡Compra exitosa! Revisa tus entradas en "Mis Entradas"');
-            localStorage.removeItem('carrito');
+            alert('✅ ¡Compra realizada exitosamente!\n\nTus entradas están en la sección "Mis Entradas"');
             window.location.href = '{{ route("entradas") }}';
-        } else {
-            alert('Error al procesar la compra');
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error: ' + error.message);
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error al procesar la compra');
     }
-}
+
+    // Cargar carrito al iniciar
+    cargarCarrito();
+
+    // Actualizar carrito cada segundo para mostrar tiempo restante
+    setInterval(() => {
+        if (carrito.length > 0) {
+            cargarDetallesReservas();
+        }
+    }, 60000); // Cada minuto
 </script>
 @endsection

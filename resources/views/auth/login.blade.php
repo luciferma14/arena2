@@ -1,85 +1,77 @@
 @extends('layouts.app')
 
-@section('title', 'Acceso - TicketLand')
+@section('title', 'Ingresar - Roig Arena')
 
 @section('content')
-<div class="grid md:grid-cols-2 gap-8 items-center min-h-[calc(100vh-200px)] py-12">
-    <div class="space-y-6">
-        <div>
-            <h1 class="text-4xl font-black text-white mb-2">Bienvenido</h1>
-            <p class="text-slate-400">Accede a tu cuenta para comprar entradas</p>
-        </div>
-        <div class="space-y-4 text-slate-300">
-            <div class="flex gap-3"><span class="text-indigo-400">→</span><span>Explora eventos en vivo</span></div>
-            <div class="flex gap-3"><span class="text-indigo-400">→</span><span>Reserva tus asientos</span></div>
-            <div class="flex gap-3"><span class="text-indigo-400">→</span><span>Acceso inmediato</span></div>
-        </div>
-    </div>
+<div class="min-h-screen flex items-center justify-center -mx-6 -my-8">
+    <div class="w-full max-w-md p-8 bg-slate-800 rounded-lg border border-slate-700 shadow-xl">
+        <h1 class="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+            Ingresar
+        </h1>
 
-    <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-8 backdrop-blur">
-        <form id="authForm" class="space-y-5">
+        <form action="{{ route('login') }}" method="POST" class="space-y-5">
+            @csrf
+
+            <!-- Email -->
             <div>
-                <label class="block text-slate-300 text-sm font-semibold mb-2">Email</label>
-                <input type="email" id="emailField" placeholder="tu@email.com" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
-                <div id="emailError" class="text-xs text-red-400 mt-1 hidden"></div>
+                <label for="email" class="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value="{{ old('email') }}"
+                    required
+                    class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition"
+                    placeholder="tu@email.com"
+                >
+                @error('email')
+                    <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
+            <!-- Password -->
             <div>
-                <label class="block text-slate-300 text-sm font-semibold mb-2">Contraseña</label>
-                <input type="password" id="pwdField" placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
-                <div id="pwdError" class="text-xs text-red-400 mt-1 hidden"></div>
+                <label for="password" class="block text-sm font-medium text-slate-300 mb-2">Contraseña</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                    class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition"
+                    placeholder="••••••••"
+                >
+                @error('password')
+                    <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
-            <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition">
-                Acceder
+            <!-- Remember Me -->
+            <div class="flex items-center">
+                <input
+                    type="checkbox"
+                    id="remember"
+                    name="remember"
+                    class="w-4 h-4 bg-slate-700 border border-slate-600 rounded accent-red-600"
+                >
+                <label for="remember" class="ml-2 text-sm text-slate-400">Recuérdame</label>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+                type="submit"
+                class="w-full py-2 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg hover:from-red-700 hover:to-red-800 transition duration-200"
+            >
+                Ingresar
             </button>
-
-            <div class="text-center text-slate-400 text-sm">
-                ¿Sin cuenta? <a href="{{ route('register') }}" class="text-indigo-400 hover:text-indigo-300">Crea una aquí</a>
-            </div>
         </form>
+
+        <!-- Register Link -->
+        <p class="text-center text-slate-400 text-sm mt-6">
+            ¿No tienes cuenta?
+            <a href="{{ route('register') }}" class="text-red-400 hover:text-red-300 font-semibold">
+                Regístrate aquí
+            </a>
+        </p>
     </div>
 </div>
-
-<script>
-const LoginCtrl = {
-    async init() {
-        document.getElementById('authForm').addEventListener('submit', (e) => this.submit(e));
-    },
-
-    async submit(e) {
-        e.preventDefault();
-        document.getElementById('emailError').classList.add('hidden');
-        document.getElementById('pwdError').classList.add('hidden');
-
-        try {
-            const { data } = await window.axios.post('/login', {
-                email: document.getElementById('emailField').value,
-                password: document.getElementById('pwdField').value
-            });
-
-            Auth.set(data.token);
-            location.href = '{{ route("dashboard") }}';
-        } catch(err) {
-            const msg = err.response?.data?.message || 'Error de conexión';
-            document.getElementById('emailError').textContent = '❌ ' + msg;
-            document.getElementById('emailError').classList.remove('hidden');
-        }
-    }
-};
-
-document.addEventListener('DOMContentLoaded', () => LoginCtrl.init());
-</script>
-@endsection
-                document.getElementById('emailError').classList.remove('hidden');
-            }
-        } catch (err) {
-            document.getElementById('pwdError').textContent = '❌ Error de conexión';
-            document.getElementById('pwdError').classList.remove('hidden');
-        }
-    }
-};
-
-LoginCtrl.form.addEventListener('submit', e => LoginCtrl.submit(e));
-</script>
 @endsection

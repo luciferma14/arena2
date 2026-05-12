@@ -1,66 +1,111 @@
 @extends('layouts.app')
 
-@section('title', 'Catálogo - TicketLand')
+@section('title', 'Eventos - Roig Arena')
 
 @section('content')
-<div class="mb-12">
-    <h1 class="text-5xl font-black text-white mb-3">Catálogo de Eventos</h1>
-    <p class="text-slate-400">Descubre y compra entradas para eventos increíbles</p>
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold mb-3 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+            🎭 Próximos Eventos
+        </h1>
+        <p class="text-slate-400">Descubre y compra entradas para los mejores eventos</p>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading" class="text-center py-12">
+        <div class="inline-block animate-spin">
+            <div class="h-8 w-8 border-4 border-red-600 border-t-transparent rounded-full"></div>
+        </div>
+        <p class="text-slate-400 mt-3">Cargando eventos...</p>
+    </div>
+
+    <!-- Events Grid -->
+    <div id="eventos-container" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Los eventos se cargarán aquí con JavaScript -->
+    </div>
+
+    <!-- No Events Message -->
+    <div id="no-eventos" class="hidden text-center py-12">
+        <p class="text-slate-400 text-lg">No hay eventos disponibles en este momento.</p>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message" class="hidden p-4 rounded-lg bg-red-950/40 border-l-4 border-red-500 text-red-200">
+        <p id="error-text"></p>
+    </div>
 </div>
 
-<div id="eventList" class="space-y-4">
-    <div class="text-center py-12 text-slate-400">⏳ Cargando catálogo...</div>
-</div>
+@endsection
 
+@section('scripts')
 <script>
-const EventsLib = {
-    container: document.getElementById('eventList'),
-
-    async init() {
+    // Cargar eventos desde la API
+    async function cargarEventos() {
         try {
-            const { data } = await window.axios.get('/eventos');
+            const response = await fetch('/api/eventos');
+            const data = await response.json();
 
-            this.container.innerHTML = '';
+            if (!response.ok) {
+                throw new Error(data.message || 'Error al cargar eventos');
+            }
 
-            if (!data || data.length === 0) {
-                this.container.innerHTML = '<div class="text-center py-12 text-slate-400">📭 No hay eventos disponibles</div>';
+            const eventos = data.data;
+            const container = document.getElementById('eventos-container');
+            const loading = document.getElementById('loading');
+            const noEventos = document.getElementById('no-eventos');
+
+            if (eventos.length === 0) {
+                loading.classList.add('hidden');
+                noEventos.classList.remove('hidden');
                 return;
             }
 
-            data.forEach(event => {
-                const dateObj = new Date(event.fecha_evento);
-                const dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
-                this.container.appendChild(this.createEventCard(event, dateStr));
-            });
-        } catch (err) {
-            this.container.innerHTML = '<div class="text-center py-12 text-red-400">⚠️ Error cargando eventos</div>';
-        }
-    },
-
-    createEventCard(event, dateStr) {
-        const card = document.createElement('div');
-        card.className = 'group bg-gradient-to-r from-slate-800 to-slate-900 border border-slate-700 rounded-lg p-6 hover:border-cyan-500/50 transition cursor-pointer';
-        card.onclick = () => location.href = `/eventos/${event.id}`;
-
-        card.innerHTML = `
-            <div class="flex justify-between items-start mb-3">
-                <div>
-                    <h2 class="text-2xl font-bold text-white group-hover:text-cyan-300 transition">${event.nombre}</h2>
-                    <p class="text-slate-400 text-sm mt-1">${event.descripcion_corta || event.nombre}</p>
+            container.innerHTML = eventos.map(evento => `
+                <div class="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden hover:border-red-500 transition group cursor-pointer" onclick="irAEvento(${evento.id})">
+                    <div class="relative overflow-hidden h-48 bg-slate-700">
+                        ${evento.poster_url ? `
+                            <img src="${evento.poster_url}" alt="${evento.nombre}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        ` : `
+                            <div class="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-red-900 to-red-800">
+                                🎭
+                            </div>
+                        `}
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold text-white mb-2 group-hover:text-red-400 transition">
+                            ${evento.nombre}
+                        </h3>
+                        <p class="text-slate-400 text-sm mb-3 line-clamp-2">
+                            ${evento.descripcion_corta}
+                        </p>
+                        <div class="space-y-2 text-sm text-slate-400 mb-4">
+                            <p>📅 ${new Date(evento.fecha).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                            <p>🕐 ${evento.hora}</p>
+                        </div>
+                        <button class="w-full py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition duration-200">
+                            Ver Detalles
+                        </button>
+                    </div>
                 </div>
-                <div class="text-right"><div class="text-3xl">🎟</div></div>
-            </div>
-            <div class="flex gap-6 text-sm text-slate-300">
-                <span>📅 ${dateStr}</span>
-                <span>⏰ ${event.hora || 'N/A'}</span>
-            </div>
-            <div class="mt-4 inline-block px-4 py-2 bg-cyan-600/20 border border-cyan-600/50 rounded text-cyan-300 text-sm hover:bg-cyan-600/30">Explorar →</div>
-        `;
+            `).join('');
 
-        return card;
+            loading.classList.add('hidden');
+            container.classList.remove('hidden');
+
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error-message').classList.remove('hidden');
+            document.getElementById('error-text').textContent = error.message;
+        }
     }
-};
 
-document.addEventListener('DOMContentLoaded', () => EventsLib.init());
+    function irAEvento(id) {
+        window.location.href = `/eventos/${id}`;
+    }
+
+    // Cargar eventos al iniciar
+    cargarEventos();
 </script>
 @endsection

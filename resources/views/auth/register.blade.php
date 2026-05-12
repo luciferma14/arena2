@@ -1,117 +1,113 @@
 @extends('layouts.app')
 
-@section('title', 'Crear Cuenta - TicketLand')
+@section('title', 'Registrarse - Roig Arena')
 
 @section('content')
-<div class="max-w-2xl mx-auto py-12">
-    <div class="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl p-10 shadow-2xl">
-        <div class="mb-10 text-center">
-            <h1 class="text-3xl font-black text-white mb-2">Únete a TicketLand</h1>
-            <p class="text-slate-400">Crea tu cuenta en segundos</p>
-        </div>
+<div class="min-h-screen flex items-center justify-center -mx-6 -my-8">
+    <div class="w-full max-w-md p-8 bg-slate-800 rounded-lg border border-slate-700 shadow-xl">
+        <h1 class="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+            Crear Cuenta
+        </h1>
 
-        <form id="signupForm" class="space-y-4">
-            <div class="grid md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-slate-300 text-sm font-semibold mb-1.5">Nombre</label>
-                    <input type="text" id="fname" class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none" required>
-                    <div id="fnameErr" class="text-xs text-red-400 mt-1 hidden"></div>
-                </div>
+        <form action="{{ route('register') }}" method="POST" class="space-y-5">
+            @csrf
 
-                <div>
-                    <label class="block text-slate-300 text-sm font-semibold mb-1.5">Apellido</label>
-                    <input type="text" id="lname" class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none" required>
-                    <div id="lnameErr" class="text-xs text-red-400 mt-1 hidden"></div>
-                </div>
-            </div>
-
+            <!-- Nombre -->
             <div>
-                <label class="block text-slate-300 text-sm font-semibold mb-1.5">Email</label>
-                <input type="email" id="emailAddr" class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none" required>
-                <div id="emailErr" class="text-xs text-red-400 mt-1 hidden"></div>
+                <label for="nombre" class="block text-sm font-medium text-slate-300 mb-2">Nombre</label>
+                <input
+                    type="text"
+                    id="nombre"
+                    name="nombre"
+                    value="{{ old('nombre') }}"
+                    required
+                    class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition"
+                    placeholder="Juan"
+                >
+                @error('nombre')
+                    <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
-            <div class="grid md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-slate-300 text-sm font-semibold mb-1.5">Contraseña</label>
-                    <input type="password" id="passwd" class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none" required minlength="8">
-                    <div id="passwdErr" class="text-xs text-red-400 mt-1 hidden"></div>
-                    <p class="text-xs text-slate-400 mt-1">Mín. 8 caracteres</p>
-                </div>
-
-                <div>
-                    <label class="block text-slate-300 text-sm font-semibold mb-1.5">Confirmar</label>
-                    <input type="password" id="passwdConf" class="w-full px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none" required>
-                    <div id="passwdConfErr" class="text-xs text-red-400 mt-1 hidden"></div>
-                </div>
+            <!-- Apellido -->
+            <div>
+                <label for="apellido" class="block text-sm font-medium text-slate-300 mb-2">Apellido</label>
+                <input
+                    type="text"
+                    id="apellido"
+                    name="apellido"
+                    value="{{ old('apellido') }}"
+                    required
+                    class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition"
+                    placeholder="Pérez"
+                >
+                @error('apellido')
+                    <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
-            <button type="submit" class="w-full py-3 mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition">
-                Crear Cuenta
+            <!-- Email -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value="{{ old('email') }}"
+                    required
+                    class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition"
+                    placeholder="tu@email.com"
+                >
+                @error('email')
+                    <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-slate-300 mb-2">Contraseña</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                    class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition"
+                    placeholder="••••••••"
+                >
+                @error('password')
+                    <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Confirm Password -->
+            <div>
+                <label for="password_confirmation" class="block text-sm font-medium text-slate-300 mb-2">Confirmar Contraseña</label>
+                <input
+                    type="password"
+                    id="password_confirmation"
+                    name="password_confirmation"
+                    required
+                    class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition"
+                    placeholder="••••••••"
+                >
+            </div>
+
+            <!-- Submit Button -->
+            <button
+                type="submit"
+                class="w-full py-2 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg hover:from-red-700 hover:to-red-800 transition duration-200"
+            >
+                Registrarse
             </button>
-
-            <div class="text-center text-slate-400 text-sm mt-6">
-                ¿Ya tienes cuenta? <a href="{{ route('login') }}" class="text-purple-400 hover:text-purple-300">Accede aquí</a>
-            </div>
         </form>
+
+        <!-- Login Link -->
+        <p class="text-center text-slate-400 text-sm mt-6">
+            ¿Ya tienes cuenta?
+            <a href="{{ route('login') }}" class="text-red-400 hover:text-red-300 font-semibold">
+                Inicia sesión aquí
+            </a>
+        </p>
     </div>
 </div>
-
-<script>
-const SignUpCtrl = {
-    async init() {
-        document.getElementById('signupForm').addEventListener('submit', (e) => this.submit(e));
-    },
-
-    clearErrors() {
-        ['fnameErr', 'lnameErr', 'emailErr', 'passwdErr', 'passwdConfErr'].forEach(id => {
-            document.getElementById(id).classList.add('hidden');
-        });
-    },
-
-    showError(fieldId, msg) {
-        document.getElementById(fieldId).textContent = msg;
-        document.getElementById(fieldId).classList.remove('hidden');
-    },
-
-    async submit(e) {
-        e.preventDefault();
-        this.clearErrors();
-
-        const pwd = document.getElementById('passwd').value;
-        const pwdConf = document.getElementById('passwdConf').value;
-
-        if (pwd !== pwdConf) {
-            this.showError('passwdConfErr', '❌ Las contraseñas no coinciden');
-            return;
-        }
-
-        try {
-            const { data } = await window.axios.post('/register', {
-                nombre: document.getElementById('fname').value,
-                apellido: document.getElementById('lname').value,
-                email: document.getElementById('emailAddr').value,
-                password: pwd,
-                password_confirmation: pwdConf
-            });
-
-            Auth.set(data.token);
-            location.href = '{{ route("dashboard") }}';
-        } catch (err) {
-            const msg = err.response?.data?.message || 'Error al registrarse';
-            this.showError('emailErr', '❌ ' + msg);
-        }
-    }
-};
-
-document.addEventListener('DOMContentLoaded', () => SignUpCtrl.init());
-</script>
-@endsection
-            this.showError('email', '❌ Error de conexión');
-        }
-    }
-};
-
-SignUpCtrl.form.addEventListener('submit', e => SignUpCtrl.submit(e));
-</script>
 @endsection

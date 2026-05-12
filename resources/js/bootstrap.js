@@ -2,7 +2,7 @@ import axios from 'axios';
 
 window.axios = axios;
 
-const TOKEN_KEY = 'auth_token';
+const TOKEN_KEY = 'token';
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 window.axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -26,3 +26,4 @@ window.Auth = {
         delete window.axios.defaults.headers.common['Authorization'];
     }
 };
+

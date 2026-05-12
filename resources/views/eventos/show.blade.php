@@ -1,164 +1,389 @@
 @extends('layouts.app')
 
-@section('title', 'Detalles del Evento - TicketLand')
+@section('title', 'Evento - Roig Arena')
 
 @section('content')
-<div class="mb-8">
-    <a href="{{ route('home') }}" class="text-cyan-400 hover:text-cyan-300 text-sm flex items-center gap-2 mb-6">
-        ← Volver al Catálogo
-    </a>
-</div>
+<div class="space-y-8">
+    <!-- Loading State -->
+    <div id="loading" class="text-center py-12">
+        <div class="inline-block animate-spin">
+            <div class="h-8 w-8 border-4 border-red-600 border-t-transparent rounded-full"></div>
+        </div>
+        <p class="text-slate-400 mt-3">Cargando evento...</p>
+    </div>
 
-<div id="eventDetail" class="space-y-8">
-    <div class="text-slate-400 text-center py-12">Cargando detalles del evento...</div>
-</div>
+    <!-- Event Details -->
+    <div id="evento-container" class="hidden space-y-8">
+        <!-- Back Button -->
+        <a href="{{ route('home') }}" class="inline-flex items-center text-red-400 hover:text-red-300 transition">
+            ← Volver a eventos
+        </a>
 
-<script>
-const EventDetailCtrl = {
-    eventId: {{ $id }},
-    container: document.getElementById('eventDetail'),
-    cartData: {},
-
-    async initialize() {
-        try {
-            const { data } = await window.axios.get(`/eventos/${this.eventId}`);
-            const event = data.evento;
-            const sectors = data.sectores_disponibles;
-            this.render(event, sectors);
-            this.loadCart();
-        } catch (err) {
-            this.container.innerHTML = '<div class="text-red-400 text-center py-12">⚠️ Error al cargar evento</div>';
-        }
-    },
-
-    render(event, sectors) {
-        try {
-            const eventDate = new Date(event.fecha_evento);
-            const dateFormatted = eventDate.toLocaleDateString('es-ES', {
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-            }).toUpperCase();
-
-            const heroHTML = `
-                <div class="bg-gradient-to-br from-green-900 to-emerald-900 border border-emerald-700 rounded-xl p-8">
-                    <h1 class="text-5xl font-black text-white mb-3">${event.nombre}</h1>
-                    <p class="text-emerald-200 text-lg mb-6">${event.descripcion_corta || event.nombre}</p>
-                    <div class="flex gap-8 text-emerald-100">
-                        <div class="flex items-center gap-2">
-                            <span class="text-2xl">📅</span>
-                            <div><p class="text-xs text-emerald-300">FECHA</p><p class="font-semibold">${dateFormatted}</p></div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-2xl">⏰</span>
-                            <div><p class="text-xs text-emerald-300">HORA</p><p class="font-semibold">${event.hora || 'N/A'}</p></div>
-                        </div>
-                    </div>
+        <!-- Event Header -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="md:col-span-2">
+                <div id="evento-poster" class="w-full h-80 bg-slate-700 rounded-lg mb-6 overflow-hidden">
+                    <!-- Poster image will be inserted here -->
                 </div>
-            `;
-
-            const descHTML = `
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="md:col-span-2">
-                        <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-8">
-                            <h2 class="text-2xl font-bold text-white mb-4">Información del Evento</h2>
-                            <p class="text-slate-300 leading-relaxed">${event.descripcion_larga || event.descripcion_corta}</p>
-                        </div>
-                        <div class="mt-8">
-                            <h2 class="text-2xl font-bold text-white mb-6">Selecciona Sectores</h2>
-                            <div id="sectoresGrid" class="grid md:grid-cols-2 gap-4"></div>
-                        </div>
-                    </div>
-                    <div class="md:sticky md:top-24 h-fit">
-                        <div class="bg-slate-800/80 border border-slate-700 rounded-lg p-6 backdrop-blur">
-                            <h3 class="text-xl font-bold text-white mb-4">Tu Compra</h3>
-                            <div id="cartSummary" class="space-y-2 min-h-12 text-slate-300">
-                                <p class="text-sm">Agrega entradas para ver resumen</p>
-                            </div>
-                        </div>
-                    </div>
+                <div id="evento-info" class="space-y-4">
+                    <!-- Event details will be inserted here -->
                 </div>
-            `;
-
-            this.container.innerHTML = heroHTML + descHTML;
-
-            const sectorsContainer = document.getElementById('sectoresGrid');
-            sectors.forEach(sector => this.renderSector(sector, sectorsContainer));
-        } catch (e) {
-            console.error('Render error:', e);
-        }
-    },
-
-    renderSector(sector, container) {
-        const sectorEl = document.createElement('div');
-        sectorEl.className = 'bg-slate-800/50 border border-slate-700 rounded-lg p-5 hover:border-green-600/50 transition';
-        sectorEl.innerHTML = `
-            <div class="mb-4">
-                <h3 class="text-lg font-bold text-white">${sector.nombre}</h3>
-                <p class="text-xs text-slate-400 mt-1">${sector.asientos_disponibles} disponibles</p>
             </div>
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-2xl font-bold text-green-400">$${(sector.precio || 0).toFixed(2)}</span>
+
+            <!-- Sidebar with Stats -->
+            <div class="bg-slate-800 rounded-lg border border-slate-700 p-6 h-fit sticky top-24">
+                <div id="evento-stats" class="space-y-4">
+                    <!-- Stats will be inserted here -->
+                </div>
             </div>
-            <div class="flex gap-2">
-                <input type="number" min="0" max="${sector.asientos_disponibles}" value="0" class="flex-1 px-3 py-2 bg-slate-900 border border-slate-600 rounded text-white text-sm" id="qty_${sector.id}">
-                <button onclick="EventDetailCtrl.addToCart(${this.eventId}, ${sector.id}, '${sector.nombre}', ${sector.precio || 0})" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-semibold transition">
-                    Añadir
+        </div>
+
+        <!-- Sectors and Seats -->
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold text-white mb-6">Selecciona tu Asiento</h2>
+
+            <!-- Sector Tabs -->
+            <div id="sectores-tabs" class="flex gap-2 mb-6 overflow-x-auto pb-2">
+                <!-- Tabs will be inserted here -->
+            </div>
+
+            <!-- Seats Grid -->
+            <div id="asientos-container" class="bg-slate-800 rounded-lg border border-slate-700 p-8">
+                <!-- Seats will be inserted here -->
+            </div>
+
+            <!-- Legend -->
+            <div class="mt-8 flex gap-6 flex-wrap text-sm">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 bg-slate-600 rounded border border-slate-500"></div>
+                    <span class="text-slate-300">Disponible</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 bg-yellow-600 rounded border border-yellow-500"></div>
+                    <span class="text-slate-300">Reservado</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 bg-red-600 rounded border border-red-500"></div>
+                    <span class="text-slate-300">Vendido</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 bg-green-600 rounded border border-green-500"></div>
+                    <span class="text-slate-300">Seleccionado</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selected Seats Summary -->
+        @auth
+        <div class="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-700 p-6">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400 text-sm">Asientos seleccionados: <span id="selected-count" class="text-red-400 font-bold">0</span></p>
+                    <p class="text-white text-lg font-bold">Total: <span id="total-price" class="text-red-400">€0.00</span></p>
+                </div>
+                <button onclick="agregarAlCarrito()" class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition duration-200">
+                    🛒 Agregar al Carrito
                 </button>
             </div>
-        `;
-        container.appendChild(sectorEl);
-    },
+        </div>
+        <div class="pb-24"></div>
+        @else
+        <div class="text-center py-8 bg-red-900/20 border border-red-700 rounded-lg">
+            <p class="text-slate-300 mb-4">Debes estar registrado para comprar entradas</p>
+            <a href="{{ route('login') }}" class="inline-block px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition">
+                Ingresar
+            </a>
+        </div>
+        @endauth
+    </div>
 
-    addToCart(eventId, sectorId, sectorName, price) {
-        const qtyInput = document.getElementById(`qty_${sectorId}`);
-        const qty = parseInt(qtyInput.value) || 0;
+    <!-- Error Message -->
+    <div id="error-message" class="hidden p-4 rounded-lg bg-red-950/40 border-l-4 border-red-500 text-red-200">
+        <p id="error-text"></p>
+    </div>
+</div>
 
-        if (qty <= 0) {
-            alert('Ingresa cantidad válida');
-            return;
+@endsection
+
+@section('scripts')
+<script>
+    const eventoId = {{ isset($id) ? $id : 'null' }};
+    let eventoData = null;
+    let sectorActual = null;
+    let asientosSeleccionados = {};
+
+    async function cargarEvento() {
+        try {
+            const response = await fetch(`/api/eventos/${eventoId}`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Error al cargar evento');
+            }
+
+            eventoData = data.data;
+            renderizarEvento();
+            cargarAsientos();
+
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error-message').classList.remove('hidden');
+            document.getElementById('error-text').textContent = error.message;
         }
+    }
 
-        if (!this.cartData[eventId]) this.cartData[eventId] = [];
-        const exists = this.cartData[eventId].find(i => i.sectorId === sectorId);
-        if (exists) {
-            exists.cantidad += qty;
+    function renderizarEvento() {
+        const evento = eventoData.evento;
+
+        // Poster
+        const posterDiv = document.getElementById('evento-poster');
+        if (evento.poster_url) {
+            posterDiv.innerHTML = `<img src="${evento.poster_url}" alt="${evento.nombre}" class="w-full h-full object-cover">`;
         } else {
-            this.cartData[eventId].push({ sectorId, sectorName, price, cantidad: qty });
+            posterDiv.innerHTML = '<div class="w-full h-full flex items-center justify-center text-6xl bg-gradient-to-br from-red-900 to-red-800">🎭</div>';
         }
 
-        localStorage.setItem('cart_tickets', JSON.stringify(this.cartData));
-        qtyInput.value = '0';
-        this.updateSummary();
-    },
+        // Información del evento
+        const infoDiv = document.getElementById('evento-info');
+        infoDiv.innerHTML = `
+            <h1 class="text-4xl font-bold text-white">${evento.nombre}</h1>
+            <p class="text-slate-400 text-lg">${evento.descripcion_corta}</p>
+            <div class="mt-6 space-y-3 text-slate-300">
+                <p class="text-base"><span class="font-semibold">📅 Fecha:</span> ${new Date(evento.fecha).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                <p class="text-base"><span class="font-semibold">🕐 Hora:</span> ${evento.hora}</p>
+            </div>
+            <div class="mt-6 p-4 bg-slate-700/50 rounded-lg">
+                <p class="text-slate-300">${evento.descripcion_larga}</p>
+            </div>
+        `;
 
-    loadCart() {
-        this.cartData = JSON.parse(localStorage.getItem('cart_tickets') || '{}');
-        this.updateSummary();
-    },
+        // Stats
+        const statsDiv = document.getElementById('evento-stats');
+        statsDiv.innerHTML = `
+            <div class="text-center pb-4 border-b border-slate-600">
+                <p class="text-slate-400 text-sm mb-1">Asientos Disponibles</p>
+                <p class="text-3xl font-bold text-green-400">${eventoData.asientos_disponibles}</p>
+            </div>
+            <div class="text-center pb-4 border-b border-slate-600">
+                <p class="text-slate-400 text-sm mb-1">Entradas Vendidas</p>
+                <p class="text-3xl font-bold text-red-400">${eventoData.entradas_vendidas}</p>
+            </div>
+            <div class="text-center">
+                <p class="text-slate-400 text-sm mb-1">Sectores Disponibles</p>
+                <p class="text-3xl font-bold text-blue-400">${eventoData.sectores_disponibles.length}</p>
+            </div>
+        `;
 
-    updateSummary() {
-        const items = this.cartData[this.eventId] || [];
-        const summary = document.getElementById('cartSummary');
+        // Sectores tabs
+        const tabsDiv = document.getElementById('sectores-tabs');
+        tabsDiv.innerHTML = eventoData.sectores_disponibles.map((sector, index) => `
+            <button
+                onclick="cambiarSector(${sector.id}, '${sector.nombre}')"
+                class="sector-tab px-4 py-2 rounded-lg font-semibold transition duration-200 whitespace-nowrap ${index === 0 ? 'bg-red-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}"
+                data-sector-id="${sector.id}"
+            >
+                ${sector.nombre}
+            </button>
+        `).join('');
 
-        if (items.length === 0) {
-            summary.innerHTML = '<p class="text-sm text-slate-400">Sin artículos</p>';
-            return;
+        // Cargar primer sector
+        if (eventoData.sectores_disponibles.length > 0) {
+            sectorActual = eventoData.sectores_disponibles[0].id;
+            cargarAsientos();
         }
 
-        let total = 0;
-        let html = '<div class="space-y-2 mb-4 pb-4 border-b border-slate-700">';
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('evento-container').classList.remove('hidden');
+    }
 
-        items.forEach(item => {
-            const subtotal = (item.price || 0) * item.cantidad;
-            total += subtotal;
-            html += `<div class="flex justify-between text-sm"><span class="text-slate-300">${item.sectorName} ×${item.cantidad}</span><span class="text-green-400 font-semibold">$${subtotal.toFixed(2)}</span></div>`;
+    function cambiarSector(sectorId, sectorNombre) {
+        sectorActual = sectorId;
+
+        // Actualizar tabs
+        document.querySelectorAll('.sector-tab').forEach(tab => {
+            if (parseInt(tab.dataset.sectorId) === sectorId) {
+                tab.classList.remove('bg-slate-700', 'text-slate-300');
+                tab.classList.add('bg-red-600', 'text-white');
+            } else {
+                tab.classList.remove('bg-red-600', 'text-white');
+                tab.classList.add('bg-slate-700', 'text-slate-300');
+            }
         });
 
-        html += `</div><div class="mb-4"><div class="flex justify-between mb-3"><span class="text-white font-bold">TOTAL</span><span class="text-2xl font-black text-green-400">$${total.toFixed(2)}</span></div><a href="{{ route('carrito') }}" class="block w-full py-3 bg-green-600 hover:bg-green-700 text-white text-center rounded font-bold transition">Proceder al Carrito</a></div>`;
-
-        summary.innerHTML = html;
+        cargarAsientos();
     }
-};
 
-document.addEventListener('DOMContentLoaded', () => EventDetailCtrl.initialize());
+    async function cargarAsientos() {
+        try {
+            const response = await fetch(`/api/eventos/${eventoId}/sectores/${sectorActual}/asientos`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Error al cargar asientos');
+            }
+
+            renderizarAsientos(data.data);
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function renderizarAsientos(asientos) {
+        const container = document.getElementById('asientos-container');
+
+        // Agrupar por fila
+        const filasMap = {};
+        asientos.forEach(asiento => {
+            if (!filasMap[asiento.fila]) {
+                filasMap[asiento.fila] = [];
+            }
+            filasMap[asiento.fila].push(asiento);
+        });
+
+        const filas = Object.keys(filasMap).sort();
+
+        let html = '<div class="space-y-4">';
+
+        filas.forEach(fila => {
+            html += `<div class="flex gap-2 items-center">
+                <span class="w-8 text-center font-semibold text-slate-400 text-sm">Fila ${fila}</span>
+                <div class="flex gap-2 flex-wrap">`;
+
+            filasMap[fila].sort((a, b) => a.numero - b.numero).forEach(asiento => {
+                const estado = asiento.estado; // 'disponible', 'bloqueado', 'vendido'
+                const key = `${asiento.id}-${eventoId}`;
+                const isSelected = asientosSeleccionados[key];
+
+                let colorClass = 'bg-slate-600 border-slate-500 hover:bg-slate-500 cursor-pointer';
+                if (estado === 'vendido') {
+                    colorClass = 'bg-red-600 border-red-500 cursor-not-allowed opacity-50';
+                } else if (estado === 'bloqueado') {
+                    colorClass = 'bg-yellow-600 border-yellow-500 cursor-not-allowed';
+                } else if (isSelected) {
+                    colorClass = 'bg-green-600 border-green-500 cursor-pointer';
+                }
+
+                html += `
+                    <button
+                        class="asiento w-6 h-6 rounded border transition duration-200 ${colorClass} text-xs flex items-center justify-center font-bold"
+                        data-asiento-id="${asiento.id}"
+                        data-sector-id="${sectorActual}"
+                        data-fila="${fila}"
+                        data-numero="${asiento.numero}"
+                        data-precio="${asiento.precio}"
+                        onclick="toggleAsiento(event)"
+                        ${estado === 'vendido' || estado === 'bloqueado' ? 'disabled' : ''}
+                        title="${asiento.precio}€"
+                    >
+                        ${asiento.numero}
+                    </button>
+                `;
+            });
+
+            html += '</div></div>';
+        });
+
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function toggleAsiento(event) {
+        event.preventDefault();
+        const button = event.target.closest('button.asiento');
+        if (!button || button.disabled) return;
+
+        const asientoId = button.dataset.asientoId;
+        const key = `${asientoId}-${eventoId}`;
+
+        if (asientosSeleccionados[key]) {
+            delete asientosSeleccionados[key];
+            button.classList.remove('bg-green-600', 'border-green-500');
+            button.classList.add('bg-slate-600', 'border-slate-500');
+        } else {
+            asientosSeleccionados[key] = {
+                asiento_id: asientoId,
+                evento_id: eventoId,
+                precio: parseFloat(button.dataset.precio),
+                descripcion: `Fila ${button.dataset.fila} - Asiento ${button.dataset.numero}`
+            };
+            button.classList.remove('bg-slate-600', 'border-slate-500');
+            button.classList.add('bg-green-600', 'border-green-500');
+        }
+
+        actualizarResumen();
+    }
+
+    function actualizarResumen() {
+        const count = Object.keys(asientosSeleccionados).length;
+        const total = Object.values(asientosSeleccionados).reduce((sum, item) => sum + item.precio, 0);
+
+        document.getElementById('selected-count').textContent = count;
+        document.getElementById('total-price').textContent = `€${total.toFixed(2)}`;
+    }
+
+    async function agregarAlCarrito() {
+        if (Object.keys(asientosSeleccionados).length === 0) {
+            alert('Por favor selecciona al menos un asiento');
+            return;
+        }
+
+        try {
+            const reservas = [];
+
+            for (const [key, asiento] of Object.entries(asientosSeleccionados)) {
+                const response = await fetch('/api/reservas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        evento_id: asiento.evento_id,
+                        asiento_id: asiento.asiento_id
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Error al reservar asiento');
+                }
+
+                const data = await response.json();
+                reservas.push(data.data);
+            }
+
+            // Guardar en localStorage y redirigir
+            let carrito = JSON.parse(localStorage.getItem('reservas') || '[]');
+            carrito = carrito.concat(reservas.map(r => ({
+                id: r.id,
+                evento_id: r.evento_id,
+                asiento_id: r.asiento_id,
+                precio: Object.values(asientosSeleccionados).find(a => a.asiento_id === r.asiento_id)?.precio || 0
+            })));
+            localStorage.setItem('reservas', JSON.stringify(carrito));
+
+            window.dispatchEvent(new Event('storage'));
+
+            alert('✅ Asientos añadidos al carrito');
+            asientosSeleccionados = {};
+            cargarAsientos();
+            actualizarResumen();
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error: ' + error.message);
+        }
+    }
+
+    // Cargar evento al iniciar
+    if (eventoId) {
+        cargarEvento();
+    } else {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error-message').classList.remove('hidden');
+        document.getElementById('error-text').textContent = 'ID de evento no válido';
+    }
 </script>
 @endsection
