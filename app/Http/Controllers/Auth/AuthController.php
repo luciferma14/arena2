@@ -30,8 +30,17 @@ class AuthController extends Controller
             'is_admin' => false,
         ]);
 
-        Auth::login($user);
+        // Respuesta JSON para tests/API
+        if ($request->expectsJson()) {
+            $token = $user->createToken('auth_token')->plainTextToken;
+            return response()->json([
+                'user'  => $user,
+                'token' => $token,
+            ], 201);
+        }
 
+        // Respuesta web: login y redirigir
+        Auth::login($user);
         return redirect()->route('dashboard');
     }
 
@@ -46,11 +55,32 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            // Respuesta JSON para tests/API
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Las credenciales son incorrectas.',
+                    'errors'  => [
+                        'email' => ['Las credenciales son incorrectas.'],
+                    ],
+                ], 422);
+            }
+
+            // Respuesta web
             return back()->withErrors([
                 'email' => 'Las credenciales son incorrectas.',
             ])->onlyInput('email');
         }
 
+        // Respuesta JSON para tests/API
+        if ($request->expectsJson()) {
+            $token = Auth::user()->createToken('auth_token')->plainTextToken;
+            return response()->json([
+                'user'  => Auth::user(),
+                'token' => $token,
+            ], 200);
+        }
+
+        // Respuesta web
         $request->session()->regenerate();
 
         if (Auth::user()->is_admin) {
@@ -65,10 +95,21 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        Auth::logout();
+        // Respuesta JSON para tests/API
+        if ($request->expectsJson()) {
+            // Revocar token actual si existe
+            if ($request->user()) {
+                $request->user()->currentAccessToken()->delete();
+            }
+            return response()->json([
+                'message' => 'Sesión cerrada correctamente',
+            ], 200);
+        }
+
+        // Respuesta web
+        Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect()->route('login');
     }
 
