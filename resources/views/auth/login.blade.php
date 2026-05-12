@@ -9,7 +9,7 @@
             Ingresar
         </h1>
 
-        <form action="{{ route('login') }}" method="POST" class="space-y-5">
+        <form action="{{ route('login.post') }}" method="POST" class="space-y-5">
             @csrf
 
             <!-- Email -->

@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -30,13 +30,9 @@ class AuthController extends Controller
             'is_admin' => false,
         ]);
 
-        $token = $user->createToken('auth-token')->plainTextToken;
+        Auth::login($user);
 
-        return response()->json([
-            'user'       => $user,
-            'token'      => $token,
-            'token_type' => 'Bearer',
-        ], 201);
+        return redirect()->route('dashboard');
     }
 
     /**
@@ -49,24 +45,19 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Las credenciales son incorrectas.'],
-            ]);
+        if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            return back()->withErrors([
+                'email' => 'Las credenciales son incorrectas.',
+            ])->onlyInput('email');
         }
 
-        // Eliminar tokens anteriores
-        $user->tokens()->delete();
+        $request->session()->regenerate();
 
-        $token = $user->createToken('auth-token')->plainTextToken;
+        if (Auth::user()->is_admin) {
+            return redirect()->route('admin.dashboard');
+        }
 
-        return response()->json([
-            'user'       => $user,
-            'token'      => $token,
-            'token_type' => 'Bearer',
-        ]);
+        return redirect()->intended(route('dashboard'));
     }
 
     /**
@@ -74,11 +65,11 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-        return response()->json([
-            'message' => 'Sesión cerrada correctamente',
-        ]);
+        return redirect()->route('login');
     }
 
     /**

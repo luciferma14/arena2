@@ -1,33 +1,34 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\AuthController;
 
-// Página de inicio
 Route::get('/', function () {
     return redirect()->route('home');
-})->name('/');
+});
 
 Route::get('/home', function () {
     return view('eventos.index');
 })->name('home');
 
-// Autenticación
-Route::get('/login', function () {
-    if (auth()->check()) {
-        return redirect()->route('dashboard');
-    }
-    return view('auth.login');
-})->name('login');
+Route::get('/eventos/{id}', function ($id) {
+    return view('eventos.show', ['id' => $id]);
+})->name('evento.show');
 
-Route::get('/register', function () {
-    if (auth()->check()) {
-        return redirect()->route('dashboard');
-    }
-    return view('auth.register');
-})->name('register');
+Route::middleware('guest')->group(function () {
+    Route::get('/login', fn() => view('auth.login'))->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
-// Rutas protegidas
-Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/register', fn() => view('auth.register'))->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+});
+
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->middleware('auth:sanctum')
+    ->name('logout');
+
+    Route::middleware('auth:sanctum')->group(function () {
+
     Route::get('/dashboard', function () {
         return view('dashboard.index');
     })->name('dashboard');
@@ -40,15 +41,9 @@ Route::middleware('auth:sanctum')->group(function () {
         return view('entradas.index');
     })->name('entradas');
 
-    // Admin routes
     Route::middleware('admin')->group(function () {
         Route::get('/admin', function () {
             return view('admin.dashboard');
         })->name('admin.dashboard');
     });
 });
-
-// Evento individual
-Route::get('/eventos/{id}', function ($id) {
-    return view('eventos.show', ['id' => $id]);
-})->name('evento.show');
