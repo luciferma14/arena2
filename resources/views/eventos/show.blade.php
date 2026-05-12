@@ -92,7 +92,7 @@
                     <p class="text-slate-400 text-sm">Asientos seleccionados: <span id="selected-count" class="text-white font-bold">0</span></p>
                     <p class="text-xl font-bold text-white">Total: <span id="total-price" class="text-red-400">€0.00</span></p>
                 </div>
-                <button onclick="agregarAlCarrito()" class="px-8 py-3 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold rounded-lg transition-all duration-150 disabled:opacity-50">
+                <button onclick="agregarAlCarrito()" class="px-8 py-3 bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold rounded-lg transition-all duration-150">
                     🛒 Agregar al Carrito
                 </button>
             </div>
@@ -365,6 +365,13 @@
     async function agregarAlCarrito() {
         if (Object.keys(asientosSeleccionados).length === 0) {
             alert('Selecciona al menos un asiento');
+            return;
+        }
+
+        // Verificar sesión antes de intentar reservar
+        const authCheck = await fetch('/api/user');
+        if (!authCheck.ok) {
+            window.location.href = '{{ route("login") }}';
             return;
         }
 
