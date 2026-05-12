@@ -23,6 +23,7 @@ Route::get('/eventos/{id}', [EventoController::class, 'show']);
 
 // Sectores (consulta pública)
 Route::get('/sectores', [SectorController::class, 'index']);
+Route::get('/sectores/{id}', [SectorController::class, 'show']);
 
 // Asientos (consulta pública)
 Route::get('/eventos/{eventoId}/asientos', [AsientoController::class, 'porEvento']);
