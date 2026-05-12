@@ -30,12 +30,9 @@
         </button>
     </div>
 
-    <!-- Tab Content -->
-
     <!-- EVENTOS TAB -->
     <div id="tab-eventos" class="tab-content">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Form -->
             <div class="bg-slate-800 rounded-lg border border-slate-700 p-6">
                 <h3 class="text-xl font-bold text-white mb-6">Crear/Editar Evento</h3>
                 <form id="evento-form" class="space-y-4" onsubmit="guardarEvento(event)">
@@ -45,34 +42,29 @@
                         <label class="block text-sm font-medium text-slate-300 mb-2">Nombre</label>
                         <input type="text" id="evento-nombre" required class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-red-500">
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-slate-300 mb-2">Descripción Corta</label>
                         <input type="text" id="evento-desc-corta" required class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-red-500">
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-slate-300 mb-2">Descripción Larga</label>
                         <textarea id="evento-desc-larga" required rows="3" class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-red-500"></textarea>
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-slate-300 mb-2">URL Poster</label>
                         <input type="url" id="evento-poster" class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-red-500">
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-slate-300 mb-2">Fecha</label>
                         <input type="date" id="evento-fecha" required class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-red-500">
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-slate-300 mb-2">Hora</label>
                         <input type="time" id="evento-hora" required class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-red-500">
                     </div>
 
                     <div class="flex gap-2">
-                        <button type="submit" class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded transition">
+                        <button type="submit" id="btn-guardar-evento" class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded transition">
                             ✅ Guardar
                         </button>
                         <button type="button" onclick="limpiarEventoForm()" class="flex-1 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded transition">
@@ -82,11 +74,8 @@
                 </form>
             </div>
 
-            <!-- Events List -->
             <div class="lg:col-span-2">
-                <div id="eventos-list" class="space-y-4">
-                    <!-- Events will be loaded here -->
-                </div>
+                <div id="eventos-list" class="space-y-4"></div>
             </div>
         </div>
     </div>
@@ -94,7 +83,6 @@
     <!-- SECTORES TAB -->
     <div id="tab-sectores" class="tab-content hidden">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Form -->
             <div class="bg-slate-800 rounded-lg border border-slate-700 p-6">
                 <h3 class="text-xl font-bold text-white mb-6">Crear/Editar Sector</h3>
                 <form id="sector-form" class="space-y-4" onsubmit="guardarSector(event)">
@@ -104,14 +92,13 @@
                         <label class="block text-sm font-medium text-slate-300 mb-2">Nombre</label>
                         <input type="text" id="sector-nombre" required class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-red-500">
                     </div>
-
                     <div>
                         <label class="block text-sm font-medium text-slate-300 mb-2">Descripción</label>
                         <input type="text" id="sector-descripcion" class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-red-500">
                     </div>
 
                     <div class="flex gap-2">
-                        <button type="submit" class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded transition">
+                        <button type="submit" id="btn-guardar-sector" class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded transition">
                             ✅ Guardar
                         </button>
                         <button type="button" onclick="limpiarSectorForm()" class="flex-1 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded transition">
@@ -121,11 +108,8 @@
                 </form>
             </div>
 
-            <!-- Sectors List -->
             <div class="lg:col-span-2">
-                <div id="sectores-list" class="space-y-4">
-                    <!-- Sectors will be loaded here -->
-                </div>
+                <div id="sectores-list" class="space-y-4"></div>
             </div>
         </div>
     </div>
@@ -145,14 +129,10 @@
                 </div>
 
                 <div id="asientos-info" class="hidden mt-6 p-4 bg-blue-900/20 border border-blue-600/30 rounded-lg">
-                    <div id="asientos-stats" class="grid grid-cols-3 gap-4 text-center">
-                        <!-- Stats will be loaded here -->
-                    </div>
+                    <div id="asientos-stats" class="grid grid-cols-3 gap-4 text-center"></div>
                 </div>
 
-                <div id="asientos-list" class="mt-6 space-y-3">
-                    <!-- Asientos will be loaded here -->
-                </div>
+                <div id="asientos-list" class="mt-6 space-y-3"></div>
             </div>
         </div>
     </div>
@@ -162,28 +142,22 @@
         <p id="error-text"></p>
     </div>
 </div>
-
 @endsection
 
 @section('scripts')
 <script>
-    let eventoActual = null;
-    let sectorActual = null;
-
     function cambiarTab(tab) {
-        // Ocultar todos los tabs
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.tab-btn').forEach(el => {
             el.classList.remove('border-red-600', 'text-red-400');
             el.classList.add('border-transparent', 'text-slate-400');
         });
 
-        // Mostrar tab seleccionado
         document.getElementById(`tab-${tab}`).classList.remove('hidden');
-        document.querySelector(`[data-tab="${tab}"]`).classList.remove('border-transparent', 'text-slate-400');
-        document.querySelector(`[data-tab="${tab}"]`).classList.add('border-red-600', 'text-red-400');
+        const btn = document.querySelector(`[data-tab="${tab}"]`);
+        btn.classList.remove('border-transparent', 'text-slate-400');
+        btn.classList.add('border-red-600', 'text-red-400');
 
-        // Cargar datos si es necesario
         if (tab === 'eventos') cargarEventos();
         if (tab === 'sectores') cargarSectores();
         if (tab === 'asientos') cargarSectorSelector();
@@ -194,6 +168,7 @@
         try {
             const response = await fetch('/api/eventos');
             const data = await response.json();
+            // La API devuelve data.data con array de eventos
             const eventos = data.data;
 
             const lista = document.getElementById('eventos-list');
@@ -217,7 +192,6 @@
                 </div>
             `).join('');
         } catch (error) {
-            console.error('Error:', error);
             mostrarError('Error al cargar eventos: ' + error.message);
         }
     }
@@ -226,22 +200,27 @@
         fetch(`/api/eventos/${id}`)
             .then(r => r.json())
             .then(data => {
-                const evento = data.data;
+                // ✅ CORREGIDO: la API devuelve data.data.evento
+                const evento = data.data.evento;
+
                 document.getElementById('evento-id').value = evento.id;
-                document.getElementById('evento-nombre').value = evento.nombre;
-                document.getElementById('evento-desc-corta').value = evento.descripcion_corta;
-                document.getElementById('evento-desc-larga').value = evento.descripcion_larga;
-                document.getElementById('evento-poster').value = evento.poster_url || '';
-                document.getElementById('evento-fecha').value = evento.fecha;
-                document.getElementById('evento-hora').value = evento.hora;
-                document.querySelector('button[onclick*="guardarEvento"]').textContent = '✏️ Actualizar';
-            });
+                document.getElementById('evento-nombre').value = evento.nombre ?? '';
+                document.getElementById('evento-desc-corta').value = evento.descripcion_corta ?? '';
+                document.getElementById('evento-desc-larga').value = evento.descripcion_larga ?? '';
+                document.getElementById('evento-poster').value = evento.poster_url ?? '';
+                // La fecha viene como "2026-06-15T00:00:00.000000Z", hay que recortarla
+                document.getElementById('evento-fecha').value = evento.fecha ? evento.fecha.substring(0, 10) : '';
+                document.getElementById('evento-hora').value = evento.hora ?? '';
+
+                document.getElementById('btn-guardar-evento').textContent = '✏️ Actualizar';
+            })
+            .catch(error => mostrarError('Error al cargar evento: ' + error.message));
     }
 
     function limpiarEventoForm() {
         document.getElementById('evento-form').reset();
         document.getElementById('evento-id').value = '';
-        document.querySelector('button[onclick*="guardarEvento"]').textContent = '✅ Guardar';
+        document.getElementById('btn-guardar-evento').textContent = '✅ Guardar';
     }
 
     function guardarEvento(e) {
@@ -263,7 +242,7 @@
             method: metodo,
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
             },
             body: JSON.stringify(evento)
         })
@@ -274,7 +253,7 @@
                 limpiarEventoForm();
                 cargarEventos();
             } else {
-                throw new Error(data.error || 'Error desconocido');
+                throw new Error(data.message || data.error || 'Error desconocido');
             }
         })
         .catch(error => mostrarError('Error: ' + error.message));
@@ -286,11 +265,11 @@
         fetch(`/api/admin/eventos/${id}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
             }
         })
         .then(r => r.json())
-        .then(data => {
+        .then(() => {
             alert('✅ Evento eliminado');
             cargarEventos();
         })
@@ -322,7 +301,6 @@
                 </div>
             `).join('');
         } catch (error) {
-            console.error('Error:', error);
             mostrarError('Error al cargar sectores: ' + error.message);
         }
     }
@@ -331,18 +309,22 @@
         fetch(`/api/sectores/${id}`)
             .then(r => r.json())
             .then(data => {
-                const sector = data.data;
+                // Ajusta según lo que devuelva tu API para un sector individual
+                const sector = data.data.sector ?? data.data;
+
                 document.getElementById('sector-id').value = sector.id;
-                document.getElementById('sector-nombre').value = sector.nombre;
-                document.getElementById('sector-descripcion').value = sector.descripcion || '';
-                document.querySelector('button[onclick*="guardarSector"]').textContent = '✏️ Actualizar';
-            });
+                document.getElementById('sector-nombre').value = sector.nombre ?? '';
+                document.getElementById('sector-descripcion').value = sector.descripcion ?? '';
+
+                document.getElementById('btn-guardar-sector').textContent = '✏️ Actualizar';
+            })
+            .catch(error => mostrarError('Error al cargar sector: ' + error.message));
     }
 
     function limpiarSectorForm() {
         document.getElementById('sector-form').reset();
         document.getElementById('sector-id').value = '';
-        document.querySelector('button[onclick*="guardarSector"]').textContent = '✅ Guardar';
+        document.getElementById('btn-guardar-sector').textContent = '✅ Guardar';
     }
 
     function guardarSector(e) {
@@ -360,7 +342,7 @@
             method: metodo,
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
             },
             body: JSON.stringify(sector)
         })
@@ -371,7 +353,7 @@
                 limpiarSectorForm();
                 cargarSectores();
             } else {
-                throw new Error(data.error || 'Error desconocido');
+                throw new Error(data.message || data.error || 'Error desconocido');
             }
         })
         .catch(error => mostrarError('Error: ' + error.message));
@@ -383,11 +365,11 @@
         fetch(`/api/admin/sectores/${id}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
             }
         })
         .then(r => r.json())
-        .then(data => {
+        .then(() => {
             alert('✅ Sector eliminado');
             cargarSectores();
         })
@@ -405,7 +387,7 @@
             selector.innerHTML = '<option value="">-- Selecciona un sector --</option>' +
                 sectores.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
         } catch (error) {
-            console.error('Error:', error);
+            mostrarError('Error al cargar sectores: ' + error.message);
         }
     }
 
@@ -416,37 +398,45 @@
         try {
             const response = await fetch(`/api/sectores/${sectorId}`);
             const data = await response.json();
-            const sector = data.data;
+            // Ajusta según lo que devuelva tu API
+            const sector = data.data.sector ?? data.data;
+            const asientos = sector.asientos || [];
 
             const info = document.getElementById('asientos-info');
             const stats = document.getElementById('asientos-stats');
             const lista = document.getElementById('asientos-list');
 
+            const disponibles = asientos.filter(a => a.estado === 'disponible').length;
+            const vendidos = asientos.filter(a => a.estado === 'vendido').length;
+
             stats.innerHTML = `
                 <div>
                     <p class="text-slate-400 text-sm mb-1">Total Asientos</p>
-                    <p class="text-2xl font-bold text-white">${sector.asientos?.length || 0}</p>
+                    <p class="text-2xl font-bold text-white">${asientos.length}</p>
                 </div>
                 <div>
                     <p class="text-slate-400 text-sm mb-1">Disponibles</p>
-                    <p class="text-2xl font-bold text-green-400">${sector.disponibles || 0}</p>
+                    <p class="text-2xl font-bold text-green-400">${disponibles}</p>
                 </div>
                 <div>
                     <p class="text-slate-400 text-sm mb-1">Vendidos</p>
-                    <p class="text-2xl font-bold text-red-400">${sector.vendidos || 0}</p>
+                    <p class="text-2xl font-bold text-red-400">${vendidos}</p>
                 </div>
             `;
 
-            lista.innerHTML = (sector.asientos || []).map(asiento => `
+            lista.innerHTML = asientos.map(asiento => `
                 <div class="flex justify-between items-center bg-slate-700 p-3 rounded">
-                    <span class="text-white">${asiento.nombreCompleto()}</span>
-                    <span class="text-sm text-slate-400">${asiento.precio}€</span>
+                    <span class="text-white">Fila ${asiento.fila ?? '?'} - Asiento ${asiento.numero ?? asiento.numero_asiento ?? '?'}</span>
+                    <span class="px-2 py-1 rounded text-xs font-semibold ${
+                        asiento.estado === 'disponible' ? 'bg-green-900 text-green-300' :
+                        asiento.estado === 'vendido'    ? 'bg-red-900 text-red-300' :
+                                                          'bg-yellow-900 text-yellow-300'
+                    }">${asiento.estado ?? 'desconocido'}</span>
                 </div>
             `).join('');
 
             info.classList.remove('hidden');
         } catch (error) {
-            console.error('Error:', error);
             mostrarError('Error al cargar asientos: ' + error.message);
         }
     }
