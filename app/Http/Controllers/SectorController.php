@@ -26,7 +26,7 @@ class SectorController extends Controller
      */
     public function show($id)
     {
-        $sector = Sector::findOrFail($id);
+        $sector = Sector::with('asientos')->findOrFail($id);
 
         return response()->json([
             'data' => $sector,
