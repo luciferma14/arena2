@@ -46,7 +46,6 @@
                         Seleccionado
                     </div>
                 </div>
-                </div>{{-- /display:table --}}
             </div>
         </div>
 

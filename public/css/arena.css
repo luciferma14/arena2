@@ -602,7 +602,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     display: flex;
     flex-direction: column;
     gap: 5px;
-    align-items: flex-start; /* las filas se alinean a la izquierda dentro del table */
+    align-items: center;
 }
 
 .seat-row {
