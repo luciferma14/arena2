@@ -27,16 +27,23 @@
             </div>
 
             {{-- Mapa de asientos --}}
-            <div id="mapa-wrap" style="display:none; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:20px; margin-top:16px">
-                <p style="text-align:center; color:var(--muted); font-size:.75rem; letter-spacing:.15em; text-transform:uppercase; border:1px solid var(--border); padding:8px; margin-bottom:16px">
-                    — Escenario —
-                </p>
-                <div id="mapa-asientos"></div>
-                <p style="margin-top:12px; font-size:.78rem; color:var(--muted); text-align:center">
-                    <span style="display:inline-block;width:14px;height:14px;border:1px solid var(--gold);vertical-align:middle;margin-right:4px"></span> Disponible &nbsp;
-                    <span style="display:inline-block;width:14px;height:14px;background:var(--border);vertical-align:middle;margin-right:4px"></span> Ocupado &nbsp;
-                    <span style="display:inline-block;width:14px;height:14px;background:var(--gold);vertical-align:middle;margin-right:4px"></span> Seleccionado
-                </p>
+            <div id="mapa-wrap" class="seat-map-wrap" style="display:none; margin-top:16px">
+                <div class="seat-map-stage">Escenario / Pista</div>
+                <div id="mapa-asientos" class="seat-map"></div>
+                <div class="seat-legend">
+                    <div class="seat-legend-item">
+                        <div class="seat-legend-dot" style="border-color:var(--gold);background:transparent"></div>
+                        Disponible
+                    </div>
+                    <div class="seat-legend-item">
+                        <div class="seat-legend-dot" style="border-color:var(--border);background:var(--surface)"></div>
+                        Ocupado
+                    </div>
+                    <div class="seat-legend-item">
+                        <div class="seat-legend-dot" style="border-color:var(--gold);background:var(--gold)"></div>
+                        Seleccionado
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -169,33 +176,31 @@ function dibujarMapa(asientos) {
     var numFilas = Object.keys(filas).sort(function(a, b) { return a - b; });
 
     numFilas.forEach(function(fila) {
-        var div = document.createElement('div');
-        div.style.cssText = 'display:flex; align-items:center; gap:4px; margin-bottom:4px; flex-wrap:wrap';
+        var fila_div = document.createElement('div');
+        fila_div.className = 'seat-row';
 
         var etiqueta = document.createElement('span');
-        etiqueta.textContent = 'F' + fila;
-        etiqueta.style.cssText = 'width:28px; font-size:.7rem; color:var(--muted); text-align:right; flex-shrink:0';
-        div.appendChild(etiqueta);
+        etiqueta.className   = 'seat-row-label';
+        etiqueta.textContent = fila;
+        fila_div.appendChild(etiqueta);
 
         filas[fila].sort(function(a, b) { return a.numero - b.numero; });
 
         filas[fila].forEach(function(a) {
             var btn = document.createElement('button');
+            btn.className   = 'seat ' + (a.disponible ? 'seat-available' : 'seat-taken');
             btn.textContent = a.numero;
-            btn.title = 'Fila ' + fila + ' - Asiento ' + a.numero;
+            btn.title       = 'Fila ' + fila + ' — Asiento ' + a.numero;
+            btn.disabled    = !a.disponible;
 
             if (a.disponible) {
-                btn.style.cssText = 'width:32px; height:32px; font-size:.72rem; border:1px solid var(--gold); background:transparent; color:var(--gold); cursor:pointer; border-radius:3px';
                 btn.onclick = function() { seleccionarAsiento(a.id, fila, a.numero, btn); };
-            } else {
-                btn.style.cssText = 'width:32px; height:32px; font-size:.72rem; border:1px solid var(--border); background:var(--surface); color:var(--border); cursor:not-allowed; border-radius:3px';
-                btn.disabled = true;
             }
 
-            div.appendChild(btn);
+            fila_div.appendChild(btn);
         });
 
-        mapa.appendChild(div);
+        mapa.appendChild(fila_div);
     });
 }
 
@@ -206,12 +211,12 @@ function seleccionarAsiento(id, fila, numero, btn) {
     var idx = asientosSeleccionados.findIndex(function(s) { return s.id === id; });
     if (idx === -1) {
         asientosSeleccionados.push({ id: id, fila: fila, numero: numero });
-        btn.style.background = 'var(--gold)';
-        btn.style.color      = '#0d0d0d';
+        btn.classList.remove('seat-available');
+        btn.classList.add('seat-selected');
     } else {
         asientosSeleccionados.splice(idx, 1);
-        btn.style.background = 'transparent';
-        btn.style.color      = 'var(--gold)';
+        btn.classList.remove('seat-selected');
+        btn.classList.add('seat-available');
     }
     actualizarCarrito();
 }
