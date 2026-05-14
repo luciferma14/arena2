@@ -595,14 +595,14 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     text-transform: uppercase;
     color: var(--muted);
     margin-bottom: 20px;
+    width: 100%; /* se estira al ancho del contenedor display:table */
 }
 
 .seat-map {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    align-items: center;
-    width: 100%;
+    align-items: flex-start; /* las filas se alinean a la izquierda dentro del table */
 }
 
 .seat-row {
