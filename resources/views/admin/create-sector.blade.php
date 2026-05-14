@@ -33,7 +33,7 @@
         </div>
 
         <div class="form-group">
-            <label class="form-label" for="descripcion">Descripcion (opcional)</label>
+            <label class="form-label" for="descripcion">Descripción (opcional)</label>
             <textarea id="descripcion" name="descripcion" class="form-control"
                       rows="3" placeholder="Descripcion del sector...">{{ old('descripcion') }}</textarea>
         </div>
@@ -42,7 +42,7 @@
             <label class="form-label" for="precio_base">Precio base (EUR)</label>
             <input type="number" id="precio_base" name="precio_base" class="form-control"
                    value="{{ old('precio_base') }}" min="0" step="0.01" required>
-            <p class="form-hint">Se asignara a todos los eventos existentes y futuros.</p>
+            <p class="form-hint">Se asignará a todos los eventos existentes y futuros.</p>
             @error('precio_base')
                 <p class="form-error">{{ $message }}</p>
             @enderror

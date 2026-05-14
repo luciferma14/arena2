@@ -42,7 +42,7 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="email">Correo electronico</label>
+                <label class="form-label" for="email">Correo electrónico</label>
                 <input type="email" id="email" name="email" class="form-control"
                        value="{{ old('email') }}" required autocomplete="email">
                 @error('email')
@@ -51,17 +51,17 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="password">Contrasena</label>
+                <label class="form-label" for="password">Contraseña</label>
                 <input type="password" id="password" name="password" class="form-control"
                        required autocomplete="new-password">
-                <p class="form-hint">Minimo 8 caracteres.</p>
+                <p class="form-hint">Mínimo 8 caracteres.</p>
                 @error('password')
                     <p class="form-error">{{ $message }}</p>
                 @enderror
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="password_confirmation">Confirmar contrasena</label>
+                <label class="form-label" for="password_confirmation">Confirmar contraseña</label>
                 <input type="password" id="password_confirmation" name="password_confirmation"
                        class="form-control" required autocomplete="new-password">
             </div>
@@ -72,7 +72,7 @@
         </form>
 
         <p class="form-footer">
-            Ya tienes cuenta? <a href="{{ route('login') }}">Inicia sesion</a>
+            ¿Ya tienes cuenta? <a href="{{ route('login') }}">Inicia sesión</a>
         </p>
     </div>
 </div>

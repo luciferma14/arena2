@@ -19,19 +19,19 @@
         </div>
 
         <div class="form-group">
-            <label class="form-label" for="descripcion_corta">Descripcion corta</label>
+            <label class="form-label" for="descripcion_corta">Descripción corta</label>
             <input type="text" id="descripcion_corta" name="descripcion_corta" class="form-control"
                    value="{{ $evento['descripcion_corta'] ?? '' }}" required maxlength="255">
         </div>
 
         <div class="form-group">
-            <label class="form-label" for="descripcion_larga">Descripcion completa</label>
+            <label class="form-label" for="descripcion_larga">Descripción completa</label>
             <textarea id="descripcion_larga" name="descripcion_larga" class="form-control"
                       rows="5" required>{{ $evento['descripcion_larga'] ?? '' }}</textarea>
         </div>
 
         <div class="form-group">
-            <label class="form-label" for="poster_url">URL del poster (opcional)</label>
+            <label class="form-label" for="poster_url">URL del póster (opcional)</label>
             <input type="url" id="poster_url" name="poster_url" class="form-control"
                    value="{{ $evento['poster_url'] ?? '' }}" placeholder="https://...">
         </div>
@@ -88,7 +88,7 @@ document.getElementById('edit-form').addEventListener('submit', async (e) => {
         if (res.ok) {
             setMsg('success', 'Evento actualizado correctamente.');
         } else {
-            const errs = json.errors ? Object.values(json.errors).flat().join('<br>') : (json.message || 'Error al guardar.');
+            const errs = json.errors ? Object.values(json.errors).flat().join('<br>') : (json.message || 'Error al guardar. Comprueba los datos.');
             setMsg('error', errs);
         }
     } catch (err) {

@@ -21,7 +21,7 @@
         </div>
 
         <div class="form-group">
-            <label class="form-label" for="descripcion">Descripcion (opcional)</label>
+            <label class="form-label" for="descripcion">Descripción (opcional)</label>
             <textarea id="descripcion" name="descripcion" class="form-control" rows="3"></textarea>
         </div>
 

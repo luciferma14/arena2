@@ -6,7 +6,7 @@
 
 <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px">
     <div>
-        <p class="page-header-label">Administracion</p>
+        <p class="page-header-label">Administración</p>
         <h1 class="page-header-title">Panel</h1>
     </div>
     <a href="{{ route('eventos.create') }}" class="btn btn-gold">Nuevo evento</a>
@@ -69,7 +69,7 @@
                 <thead>
                     <tr>
                         <th>Nombre</th>
-                        <th>Descripcion</th>
+                        <th>Descripción</th>
                         <th>Estado</th>
                         <th></th>
                     </tr>
@@ -105,7 +105,7 @@
 @section('scripts')
 <script>
 async function eliminarEvento(id, nombre) {
-    if (!confirm(`Eliminar el evento "${nombre}"? Esta accion no se puede deshacer.`)) return;
+    if (!confirm('¿Eliminar el evento "' + nombre + '"? Esta acción no se puede deshacer.')) return;
 
     const res  = await fetch(`/api/admin/eventos/${id}`, { method: 'DELETE' });
     const json = await res.json();
@@ -118,7 +118,7 @@ async function eliminarEvento(id, nombre) {
 }
 
 async function eliminarSector(id, nombre) {
-    if (!confirm(`Eliminar el sector "${nombre}"? Esta accion no se puede deshacer.`)) return;
+    if (!confirm('¿Eliminar el sector "' + nombre + '"? Esta acción no se puede deshacer.')) return;
 
     const res  = await fetch(`/api/admin/sectores/${id}`, { method: 'DELETE' });
     const json = await res.json();

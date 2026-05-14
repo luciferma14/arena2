@@ -30,7 +30,7 @@
 
     {{-- QR --}}
     <div class="qr-block" style="margin-bottom:28px">
-        <p class="qr-label">Codigo QR de acceso</p>
+        <p class="qr-label">Código QR de acceso</p>
         @if($codigoQr)
             <img
                 src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ urlencode($codigoQr) }}"
@@ -47,7 +47,7 @@
 
         <div style="margin-top:16px">
             @if($valida)
-                <span class="badge badge-success" style="font-size:.85rem;padding:6px 16px">Entrada valida</span>
+                <span class="badge badge-success" style="font-size:.85rem;padding:6px 16px">Entrada válida</span>
             @else
                 <span class="badge badge-danger" style="font-size:.85rem;padding:6px 16px">Entrada expirada</span>
             @endif

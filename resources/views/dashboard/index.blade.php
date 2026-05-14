@@ -19,7 +19,7 @@
     </div>
     <div class="dash-card">
         <p class="dash-card-label">Explorar</p>
-        <p class="dash-card-value" style="font-size:1.2rem;padding-top:8px">Proximos eventos</p>
+        <p class="dash-card-value" style="font-size:1.2rem;padding-top:8px">Próximos eventos</p>
         <a href="{{ route('eventos.index') }}" class="dash-card-link">Ver cartelera &rarr;</a>
     </div>
     @if(auth()->user()->isAdmin())
@@ -40,7 +40,7 @@
     @if(count($entradas) === 0)
         <div class="panel-body">
             <div class="state-msg">
-                <p class="state-msg-title">Sin entradas todavia</p>
+                <p class="state-msg-title">Sin entradas todavía</p>
                 <p>Compra tus primeras entradas en la <a href="{{ route('eventos.index') }}">cartelera</a>.</p>
             </div>
         </div>

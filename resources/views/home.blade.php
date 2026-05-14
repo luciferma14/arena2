@@ -17,7 +17,7 @@
 </div>
 
 <div class="section">
-    <p class="section-label">Proximos eventos</p>
+    <p class="section-label">Próximos eventos</p>
     <h2 class="section-title">En cartelera</h2>
 
     <div id="eventos-container">
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const eventos = json.data || [];
 
         if (eventos.length === 0) {
-            container.innerHTML = '<div class="state-msg"><p class="state-msg-title">Sin eventos disponibles</p><p>Vuelve pronto.</p></div>';
+            container.innerHTML = '<div class="state-msg"><p class="state-msg-title">Sin eventos disponibles</p><p>Vuelve pronto, habrá nuevas fechas.</p></div>';
             return;
         }
 

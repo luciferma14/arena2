@@ -12,7 +12,7 @@
 @if(count($entradas) === 0)
     <div class="state-msg">
         <p class="state-msg-title">Sin entradas</p>
-        <p>Cuando compres entradas apareceran aqui.</p>
+        <p>Cuando compres entradas aparecerán aquí.</p>
         <a href="{{ route('eventos.index') }}" class="btn btn-outline" style="margin-top:20px">Ver eventos</a>
     </div>
 @else
