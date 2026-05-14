@@ -46,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/admin',                    [AdminWebController::class, 'index'])->name('admin.index');
         Route::get('/admin/eventos/{id}/edit',  [AdminWebController::class, 'editEvento'])->name('admin.eventos.edit');
         Route::get('/admin/sectores/create',    [AdminWebController::class, 'createSector'])->name('admin.sectores.create');
+        Route::post('/admin/sectores',          [AdminWebController::class, 'storeSector'])->name('admin.sectores.store');
         Route::get('/admin/sectores/{id}/edit', [AdminWebController::class, 'editSector'])->name('admin.sectores.edit');
     });
 });

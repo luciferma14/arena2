@@ -86,9 +86,11 @@ window.apiToken  = document.querySelector('meta[name="api-token"]')?.content || 
 
 function fmtFecha(str) {
     if (!str) return '-';
-    const d = new Date(str);
-    if (isNaN(d)) return str;
-    return d.toLocaleDateString('es-ES', { day:'2-digit', month:'2-digit', year:'numeric' });
+    // Tomar solo los 10 primeros caracteres (YYYY-MM-DD) para evitar problemas de zona horaria
+    const solo = str.substring(0, 10);
+    const [y, m, d] = solo.split('-');
+    if (!y || !m || !d) return str;
+    return d + '/' + m + '/' + y;
 }
 
 function fmtHora(h) {

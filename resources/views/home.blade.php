@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         grid.className = 'grid-events';
 
         eventos.forEach(ev => {
-            const fecha = ev.fecha ? fmtFecha(ev.fecha + 'T00:00:00') : '-';
+            const fecha = ev.fecha ? fmtFecha(ev.fecha) : '-';
             const hora  = fmtHora(ev.hora);
             const img   = ev.poster_url
                 ? `<img src="${ev.poster_url}" class="event-card-image" alt="${ev.nombre}" loading="lazy">`

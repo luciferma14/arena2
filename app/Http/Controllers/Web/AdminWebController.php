@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\SectorController;
+use App\Models\Evento;
+use App\Models\Precio;
 use Illuminate\Http\Request;
 
 class AdminWebController extends Controller
@@ -32,8 +34,50 @@ class AdminWebController extends Controller
 
     public function createSector()
     {
-        // El formulario guarda via JS → POST /api/admin/sectores
         return view('admin.create-sector');
+    }
+
+    public function storeSector(Request $request)
+    {
+        $request->validate([
+            'nombre'      => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'precio_base' => 'required|numeric|min:0',
+        ]);
+
+        // Normalizar el checkbox: si no viene en el form = false
+        $request->merge(['activo' => $request->boolean('activo')]);
+
+        $request->headers->set('Accept', 'application/json');
+
+        try {
+            $response = app(SectorController::class)->store($request);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        }
+
+        $status = $response->getStatusCode();
+        $data   = $response->getData(true);
+
+        if ($status !== 201) {
+            return back()->withErrors($data['errors'] ?? ['nombre' => 'Error al crear el sector.'])->withInput();
+        }
+
+        $sectorId   = $data['data']['id'];
+        $precioBase = (float) $request->precio_base;
+
+        // Acceso Eloquent directo: no existe endpoint API para crear precios en bloque.
+        // Asignamos el sector a todos los eventos existentes con el precio indicado.
+        $eventos = Evento::all();
+        foreach ($eventos as $evento) {
+            Precio::firstOrCreate(
+                ['evento_id' => $evento->id, 'sector_id' => $sectorId],
+                ['precio' => $precioBase, 'disponible' => true]
+            );
+        }
+
+        return redirect()->route('admin.index')
+            ->with('success', 'Sector creado y asignado a ' . $eventos->count() . ' eventos.');
     }
 
     public function editSector($id)
