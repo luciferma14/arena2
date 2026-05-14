@@ -21,13 +21,24 @@
         <form method="POST" action="{{ route('register.post') }}">
             @csrf
 
-            <div class="form-group">
-                <label class="form-label" for="name">Nombre completo</label>
-                <input type="text" id="name" name="name" class="form-control"
-                       value="{{ old('name') }}" required autocomplete="name" autofocus>
-                @error('name')
-                    <p class="form-error">{{ $message }}</p>
-                @enderror
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div class="form-group">
+                    <label class="form-label" for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control"
+                           value="{{ old('nombre') }}" required autocomplete="given-name" autofocus>
+                    @error('nombre')
+                        <p class="form-error">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="apellido">Apellido</label>
+                    <input type="text" id="apellido" name="apellido" class="form-control"
+                           value="{{ old('apellido') }}" required autocomplete="family-name">
+                    @error('apellido')
+                        <p class="form-error">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div class="form-group">

@@ -19,7 +19,7 @@
 
             @auth
                 <span class="nav-user">
-                    {{ auth()->user()->nombre ?? auth()->user()->name ?? 'Usuario' }}
+                    {{ trim((auth()->user()->nombre ?? '') . ' ' . (auth()->user()->apellido ?? '')) ?: 'Usuario' }}
                 </span>
                 <a href="{{ route('dashboard') }}" class="nav-link">Mi cuenta</a>
                 <a href="{{ route('mis-entradas') }}" class="nav-link">Entradas</a>

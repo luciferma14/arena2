@@ -7,7 +7,7 @@
 <div class="page-header">
     <p class="page-header-label">Bienvenido</p>
     <h1 class="page-header-title">
-        {{ auth()->user()->nombre ?? auth()->user()->name ?? 'Usuario' }}
+        {{ trim((auth()->user()->nombre ?? '') . ' ' . (auth()->user()->apellido ?? '')) ?: 'Usuario' }}
     </h1>
 </div>
 
