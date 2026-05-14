@@ -1,49 +1,51 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Web\AuthWebController;
+use App\Http\Controllers\Web\EventoWebController;
+use App\Http\Controllers\Web\EntradaWebController;
+use App\Http\Controllers\Web\AdminWebController;
 
+// ── Home ─────────────────────────────────────────────────
 Route::get('/', function () {
-    return redirect()->route('home');
-});
-
-Route::get('/home', function () {
-    return view('eventos.index');
+    return view('home');
 })->name('home');
 
-Route::get('/eventos/{id}', function ($id) {
-    return view('eventos.show', ['id' => $id]);
-})->name('evento.show');
-
+// ── Autenticación (solo guests) ──────────────────────────
 Route::middleware('guest')->group(function () {
-    Route::get('/login', fn() => view('auth.login'))->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-
-    Route::get('/register', fn() => view('auth.register'))->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+    Route::get('/login',     [AuthWebController::class, 'showLogin'])->name('login');
+    Route::post('/login',    [AuthWebController::class, 'login'])->name('login.post');
+    Route::get('/register',  [AuthWebController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthWebController::class, 'register'])->name('register.post');
 });
 
-Route::post('/logout', [AuthController::class, 'logout'])
+Route::post('/logout', [AuthWebController::class, 'logout'])
     ->middleware('auth:sanctum')
     ->name('logout');
 
-    Route::middleware('auth:sanctum')->group(function () {
+// ── Eventos: create ANTES de {id} para evitar conflicto de wildcard ──
+Route::get('/eventos', [EventoWebController::class, 'index'])->name('eventos.index');
 
-    Route::get('/dashboard', function () {
-        return view('dashboard.index');
-    })->name('dashboard');
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/eventos/create', [EventoWebController::class, 'create'])->name('eventos.create');
+    Route::post('/eventos',       [EventoWebController::class, 'store'])->name('eventos.store');
+});
 
-    Route::get('/carrito', function () {
-        return view('carrito.index');
-    })->name('carrito');
+// Wildcard va después de la ruta estática /eventos/create
+Route::get('/eventos/{id}', [EventoWebController::class, 'show'])->name('eventos.show');
 
-    Route::get('/entradas', function () {
-        return view('entradas.index');
-    })->name('entradas');
+// ── Rutas autenticadas ───────────────────────────────────
+Route::middleware('auth:sanctum')->group(function () {
 
+    Route::get('/dashboard',     [AuthWebController::class, 'dashboard'])->name('dashboard');
+    Route::get('/mis-entradas',  [EntradaWebController::class, 'index'])->name('mis-entradas');
+    Route::get('/entradas/{id}', [EntradaWebController::class, 'show'])->name('entradas.show');
+
+    // ── Panel admin ───────────────────────────────────────
     Route::middleware('admin')->group(function () {
-        Route::get('/admin', function () {
-            return view('admin.dashboard');
-        })->name('admin.dashboard');
+        Route::get('/admin',                    [AdminWebController::class, 'index'])->name('admin.index');
+        Route::get('/admin/eventos/{id}/edit',  [AdminWebController::class, 'editEvento'])->name('admin.eventos.edit');
+        Route::get('/admin/sectores/create',    [AdminWebController::class, 'createSector'])->name('admin.sectores.create');
+        Route::get('/admin/sectores/{id}/edit', [AdminWebController::class, 'editSector'])->name('admin.sectores.edit');
     });
 });

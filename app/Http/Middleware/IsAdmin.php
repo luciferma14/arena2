@@ -8,17 +8,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 class IsAdmin
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
         if (!$request->user() || !$request->user()->isAdmin()) {
-            return response()->json([
-                'error' => 'No tienes permisos de administrador',
-            ], 403);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'error' => 'No tienes permisos de administrador',
+                ], 403);
+            }
+            abort(403, 'Acceso restringido a administradores.');
         }
 
         return $next($request);
