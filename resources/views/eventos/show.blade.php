@@ -175,6 +175,13 @@ function dibujarMapa(asientos) {
     // Ordenar filas numéricamente
     var numFilas = Object.keys(filas).sort(function(a, b) { return a - b; });
 
+    // Ajustar el ancho del escenario al ancho real de las filas
+    var maxAsientos = 0;
+    numFilas.forEach(function(f) { if (filas[f].length > maxAsientos) maxAsientos = filas[f].length; });
+    var anchoFila = maxAsientos * (38 + 3) + 22 + 5; // seats * (size+gap) + label + margin
+    var stage = document.querySelector('.seat-map-stage');
+    if (stage) stage.style.width = anchoFila + 'px';
+
     numFilas.forEach(function(fila) {
         var fila_div = document.createElement('div');
         fila_div.className = 'seat-row';

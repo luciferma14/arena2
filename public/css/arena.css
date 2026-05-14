@@ -581,6 +581,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     border-radius: var(--radius-lg);
     padding: 24px;
     margin-bottom: 24px;
+    overflow-x: auto;
 }
 
 .seat-map-stage {
@@ -599,39 +600,43 @@ textarea.form-control { resize: vertical; min-height: 100px; }
 .seat-map {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
     align-items: center;
+    width: 100%;
 }
 
 .seat-row {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
 }
 
 .seat-row-label {
-    font-size: .65rem;
+    font-size: .68rem;
     color: var(--muted);
-    width: 20px;
+    width: 22px;
+    min-width: 22px;
     text-align: right;
-    margin-right: 4px;
-    letter-spacing: .05em;
+    margin-right: 5px;
+    letter-spacing: .04em;
 }
 
 .seat {
-    width: 26px;
-    height: 26px;
-    border-radius: 3px;
+    width: 38px;
+    height: 38px;
+    border-radius: 4px;
     border: 1px solid;
     cursor: pointer;
-    font-size: .6rem;
+    font-size: .75rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background .15s, transform .1s;
+    transition: background .15s, transform .12s;
     user-select: none;
+    flex-shrink: 0;
 }
-.seat:hover { transform: scale(1.15); }
+.seat:hover { transform: scale(1.12); }
 
 .seat-available {
     border-color: var(--gold);
@@ -668,13 +673,13 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: .75rem;
+    font-size: .78rem;
     color: var(--muted);
 }
 .seat-legend-dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
     border: 1px solid;
 }
 
