@@ -13,7 +13,7 @@ Roig Arena es una aplicación web que permite gestionar y vender entradas para e
 ## Tecnologías
 
 | Tecnología | Uso |
-|---|---|---|
+|---|---|
 | Laravel | Framework PHP principal |
 | Laravel Sail | Entorno Docker para desarrollo |
 | MySQL | Base de datos |
@@ -77,11 +77,6 @@ Los controladores Web nunca hacen llamadas HTTP internas — invocan directament
 - Crear, editar y eliminar eventos
 - Crear, editar y eliminar sectores
 - Panel de administración con tablas de gestión
-
-### Sistema automático
-- Comando programado que libera reservas expiradas cada minuto
-- Protección contra race condition con `lockForUpdate`
-- Transacciones de base de datos para operaciones críticas
 
 ---
 
