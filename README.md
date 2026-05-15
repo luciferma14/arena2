@@ -12,15 +12,15 @@ Roig Arena es una aplicación web que permite gestionar y vender entradas para e
 
 ## Tecnologías
 
-| Tecnología | Versión | Uso |
+| Tecnología | Uso |
 |---|---|---|
-| Laravel | 12 | Framework PHP principal |
-| Laravel Sail | Latest | Entorno Docker para desarrollo |
-| MySQL | 8.4 | Base de datos |
-| Laravel Sanctum | Latest | Autenticación (sesión web + token API) |
-| PHPUnit | Latest | Tests automatizados |
-| Docker | Latest | Contenedores |
-| CSS puro + JS vanilla | — | Frontend sin frameworks externos |
+| Laravel | Framework PHP principal |
+| Laravel Sail | Entorno Docker para desarrollo |
+| MySQL | Base de datos |
+| Laravel Sanctum | Autenticación (sesión web + token API) |
+| PHPUnit | Tests automatizados |
+| Docker | Contenedores |
+| CSS puro + JS vanilla | Frontend sin frameworks externos |
 
 ---
 
