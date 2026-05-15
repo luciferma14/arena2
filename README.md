@@ -94,54 +94,60 @@ Los controladores Web nunca hacen llamadas HTTP internas — invocan directament
 
 ## Tests
 
-43 tests automatizados con 100% de éxito:
+52 tests automatizados con 100% de éxito:
 
-| Tipo | Tests |
-|---|---|
-| Feature (AuthTest, EventoTest, ReservaTest, CompraTest, SectorTest, AsientoTest) | 31 |
-| Unit (ModeloTest, ReservaServiceTest, CompraServiceTest, LiberarReservasServiceTest) | 12 |
-| **Total** | **43** |
+| Archivo | Tipo | Tests |
+|---|---|---|
+| AuthTest | Feature | 5 |
+| EventoTest | Feature | 6 |
+| ReservaTest | Feature | 5 |
+| CompraTest | Feature | 4 |
+| SectorTest | Feature | 6 |
+| AsientoTest | Feature | 3 |
+| ExampleTest | Feature | 1 |
+| ModeloTest | Unit | 9 |
+| ReservaServiceTest | Unit | 5 |
+| CompraServiceTest | Unit | 4 |
+| LiberarReservasServiceTest | Unit | 3 |
+| ExampleTest | Unit | 1 |
+| **Total** | | **52** |
 
 ---
 
-## Instalación y puesta en marcha
+## Puesta en marcha
 
-### Requisitos
-- Docker Desktop con WSL2
-- Git
+### Primera vez (entorno nuevo)
 
-### Pasos
+La carpeta `vendor/` debe existir antes de poder usar Sail. Solo hay que hacer esto una vez:
 
 ```bash
 # 1. Clonar el repositorio
 git clone https://github.com/luciferma14/arena2.git
 cd arena2
 
-# 2. Copiar el fichero de entorno
+# 2. Copiar las variables de entorno
 cp .env.example .env
 
-# 3. Instalar dependencias PHP (desde el contenedor)
-docker run --rm -v $(pwd):/var/www/html -w /var/www/html \
-  laravelsail/php83-composer:latest composer install
+# 3. Instalar dependencias PHP sin necesitar PHP instalado localmente
+docker run --rm \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php83-composer:latest \
+    composer install --ignore-platform-reqs
 
-# 4. Levantar los contenedores
-./vendor/bin/sail up -d
-
-# 5. Generar clave de aplicación
-./vendor/bin/sail artisan key:generate
-
-# 6. Ejecutar migraciones y seeders
-./vendor/bin/sail artisan migrate:fresh --seed
-
-# 7. Iniciar el scheduler (en un terminal aparte)
-./vendor/bin/sail artisan schedule:work
+# 4. Levantar Sail y generar la clave de aplicación
+./vendor/bin/sail up -d && ./vendor/bin/sail artisan key:generate && ./vendor/bin/sail down
 ```
 
-O usar el script que automatiza los pasos 4-6 más los tests:
+### Uso habitual
+
+Una vez configurado el entorno, basta con ejecutar el script desde la carpeta home:
 
 ```bash
 bash ~/arena.sh
 ```
+
+El script reinicia los contenedores, espera a que MySQL esté completamente disponible, ejecuta las migraciones con los seeders y lanza la batería de tests automáticamente.
 
 ### Accesos
 
@@ -208,12 +214,3 @@ tests/
 ├── Feature/                # 31 tests de integración
 └── Unit/                   # 12 tests unitarios
 ```
-
----
-
-## Notas de diseño
-
-- **Frontend**: CSS puro con tema *dark cinema* (negro + dorado), sin frameworks externos. JS vanilla con Fetch API.
-- **Sin Vite ni npm**: los assets se sirven directamente desde `public/`.
-- **CSRF**: interceptor global en el layout que añade `X-CSRF-TOKEN` y `Authorization: Bearer` a todas las peticiones mutables a `/api`.
-- **Un solo worker**: los controladores Web llaman a los API controllers en memoria para evitar deadlocks por HTTP interno en PHP-FPM.
